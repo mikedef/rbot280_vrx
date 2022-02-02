@@ -1,0 +1,16 @@
+<launch>
+  <!-- Arguments -->
+  <arg name="set_base_frame" default="wamv/dummy_link" />  <!-- check turtlebot it's set to 'base_footprint' -->
+  <arg name="set_odom_frame" default="wamv/odom" />  <!-- check turtlebot it's set to 'odom' -->
+  <arg name="set_map_frame" default="wamv/map" />  <!-- check turtlebot it's set to 'map' -->
+
+  <!-- Gmapping -->
+  <node pkg="gmapping" type="slam_gmapping" name="wamv_slam_gmapping"
+	output="screen" >
+    <remap from="scan" to="wamv/sensors/lidars/lidar_wamv/scan"/>
+    <param name="base_frame" value="$(arg set_base_frame)"/>
+    <param name="odom_frame" value="$(arg set_odom_frame)"/>
+    <param name="map_frame"  value="$(arg set_map_frame)"/>
+    <rosparam command="load" file="$(find rbot280)/config/gmapping_params.yaml" />
+  </node>
+</launch>

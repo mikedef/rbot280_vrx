@@ -1,0 +1,21 @@
+
+
+<launch>
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping"
+	output="screen" >
+    <remap from="scan" to="wamv/sensors/lidars/lidar_wamv/scan"/>
+    <rosparam>
+      odom_frame: wamv/odom
+      base_frame: wamv/base_link
+      #map_frame: wamv/map   # TODO check this shizer!!!!!!!!!!
+
+      map_update_interval: 0.5 # (5.0) how long to  update map
+
+      maxUrange: 80.0 # (80.0) max usable range of laser. Set less than sensor range
+      maxRange: 131.0 # Set greater than sensor range
+      particles: 80 # (30) number of particles in filter
+    </rosparam>
+  </node>
+
+
+</launch>

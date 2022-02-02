@@ -1,0 +1,7 @@
+image: maps/gmapping_wamv_1.pgm
+resolution: 0.750000
+origin: [-441.750000, -57.750000, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+

@@ -1,0 +1,34 @@
+digraph G {
+"wamv/base_link" -> "wamv/front_center_camera_post_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/odom" -> "wamv/base_link"[label=" Broadcaster: /wamv/robot_localization/ekf_localization\nAverage rate: 15.204\nBuffer length: 4.933\nMost recent transform: 3285.4\nOldest transform: 3280.467\n"];
+"wamv/base_link" -> "wamv/front_left_camera_post_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/base_link" -> "wamv/front_right_camera_post_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/base_link" -> "wamv/lidar_wamv_post_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/base_link" -> "wamv/cpu_cases_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/base_link" -> "wamv/dummy_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/front_center_camera_post_arm_link" -> "wamv/front_center_camera_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/front_center_camera_post_link" -> "wamv/front_center_camera_post_arm_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/front_center_camera_link" -> "wamv/front_center_camera_link_optical"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/front_left_camera_post_arm_link" -> "wamv/front_left_camera_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/front_left_camera_post_link" -> "wamv/front_left_camera_post_arm_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/front_left_camera_link" -> "wamv/front_left_camera_link_optical"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/front_right_camera_post_arm_link" -> "wamv/front_right_camera_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/front_right_camera_post_link" -> "wamv/front_right_camera_post_arm_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/front_right_camera_link" -> "wamv/front_right_camera_link_optical"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/base_link" -> "wamv/left_battery_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/lidar_wamv_post_arm_link" -> "wamv/lidar_wamv_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/lidar_wamv_post_link" -> "wamv/lidar_wamv_post_arm_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/base_link" -> "wamv/right_battery_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"wamv/base_link" -> "wamv/left_engine_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 50.201\nBuffer length: 4.98\nMost recent transform: 3285.454\nOldest transform: 3280.474\n"];
+"wamv/left_engine_link" -> "wamv/left_propeller_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 50.201\nBuffer length: 4.98\nMost recent transform: 3285.454\nOldest transform: 3280.474\n"];
+"wamv/base_link" -> "wamv/right_engine_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 50.201\nBuffer length: 4.98\nMost recent transform: 3285.454\nOldest transform: 3280.474\n"];
+"wamv/right_engine_link" -> "wamv/right_propeller_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 50.201\nBuffer length: 4.98\nMost recent transform: 3285.454\nOldest transform: 3280.474\n"];
+"wamv/map" -> "wamv/odom"[label=" Broadcaster: /hector_mapping\nAverage rate: 10.2\nBuffer length: 4.902\nMost recent transform: 3285.318\nOldest transform: 3280.416\n"];
+"wamv/map" -> "scanmatcher_frame"[label=" Broadcaster: /hector_mapping\nAverage rate: 10.2\nBuffer length: 4.902\nMost recent transform: 3285.318\nOldest transform: 3280.416\n"];
+"wamv/base_link" -> "wamv/gps_wamv_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10.208\nBuffer length: 4.8\nMost recent transform: 3285.373\nOldest transform: 3280.573\n"];
+"wamv/base_link" -> "wamv/imu_wamv_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10.208\nBuffer length: 4.8\nMost recent transform: 3285.373\nOldest transform: 3280.573\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 3285.48"[ shape=plaintext ] ;
+}->"wamv/map";
+}

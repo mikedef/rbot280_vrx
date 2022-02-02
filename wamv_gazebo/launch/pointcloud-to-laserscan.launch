@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<!-- launch pointcloud-to-laserscan -->
+<launch>
+  <group ns="wamv">
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pc_to_ls" >
+      <remap from="cloud_in" to="sensors/lidars/lidar_wamv/points"/>
+      <remap from="scan" to="sensors/lidars/lidar_wamv/scan"/>
+      <param name="min_height" value="-3" />
+      <param name="max_height" value="6" />
+      <param name="range_min" value="1" />
+      <param name="range_max" value="200" />
+      <param name="angle_min" value="-3.14" />
+      <param name="angle_max" value="3.14" />
+      <param name="angle_increment" value="0.0087" />
+      <param name="scan_time" value="0.1" />
+      <param name="use_inf" value="false" />
+
+    </node>
+  </group>
+  
+</launch>
