@@ -1,19 +1,46 @@
-import numpy
+import numpy as np
 import cv2 as cv
 from matplotlib import pyplot as plt
 
+def auto_canny(image, sigma=0.33):
+	# compute the median of the single channel pixel intensities
+	v = np.median(image)
+	# apply automatic Canny edge detection using the computed median
+	lower = int(max(0, (1.0 - sigma) * v))
+	upper = int(min(255, (1.0 + sigma) * v))
+	edged = cv.Canny(image, lower, upper)
+	# return the edged image
+	return edged
+
+# Read images
 img1 = cv.imread('AerialMIT.tif',0)
+img1 = cv.GaussianBlur(img1, (3,3), 0)
 img = cv.imread('MIT_SP.tif',0)
-edges = cv.Canny(img,50,200)
-edges1 = cv.Canny(img1,50,200)
+img = cv.GaussianBlur(img, (3,3), 0)
+bird = cv.imread('birdseye.png')
+bird = cv.GaussianBlur(bird, (3,3), 0)
 
-plt.subplot(221),plt.imshow(img,cmap='gray')
-plt.title('orig'), plt.xticks([]), plt.yticks([])
-plt.subplot(222), plt.imshow(edges,cmap='gray')
-plt.title('edges'), plt.xticks([]), plt.yticks([])
-plt.subplot(223),plt.imshow(img1,cmap='gray')
-plt.title('orig1'), plt.xticks([]), plt.yticks([])
-plt.subplot(224), plt.imshow(edges1,cmap='gray')
-plt.title('edges1'), plt.xticks([]), plt.yticks([])
+# Find edges
+edges = auto_canny(img)
+edges1 = auto_canny(img1)
+bird_edge = auto_canny(bird)
 
-plt.show()
+# Invert colors
+bird_invert = cv.bitwise_not(bird_edge)
+mit_invert = cv.bitwise_not(edges1)
+
+
+
+# Plot
+# resize images to fit on screen but keep originals as is
+edge1 = cv.resize(bird_edge, (960,540))
+invert1 = cv.resize(bird_invert, (960,540))
+cv.imshow('gazebo', np.hstack([edge1,invert1]))
+edge2 = cv.resize(edges1, (960,540))
+invert2 = cv.resize(mit_invert, (960,540))
+cv.imshow('mit', np.hstack([edge2,invert2]))
+cv.waitKey(0)
+
+# Save image
+cv.imwrite('gazebo_map.png', bird_invert)
+cv.imwrite('aerialMIT_map.tif', invert2)
