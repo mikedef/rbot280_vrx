@@ -1,5 +1,5 @@
-image: gmapping_wamv_4.pgm
-resolution: 0.750000
+image: aerialMIT_map.tif
+resolution: 0.048825
 origin: [0.0000, 0.0000, 0.000000]
 negate: 0
 occupied_thresh: 0.65
