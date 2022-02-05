@@ -43,4 +43,4 @@ cv.waitKey(0)
 
 # Save image
 cv.imwrite('gazebo_map.png', bird_invert)
-cv.imwrite('aerialMIT_map.tif', invert2)
+cv.imwrite('aerialMIT_map.tif', mit_invert)
