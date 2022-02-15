@@ -1,3 +1,10 @@
+'''  
+Michael DeFilippo (mikedef@mit.edu)  2022-02-02
+
+This program is designed to take a georeferenced image to find the edges within the image. The edges are assumed to be the shoreline in this instance. The edge detected image is then inverted to create an occupancy grid map as per ROS standards.
+
+'''
+
 import numpy as np
 import cv2 as cv
 from matplotlib import pyplot as plt

@@ -55,7 +55,7 @@
   
   <arg name="urdf" default="$(find rbot280)/config/my_wamv.urdf"/>
 
-  launch rviz, static joint transforms, revolute joint static transforms 
+  <!-- launch rviz, static joint transforms, revolute joint static transforms -->
   <include file="$(find wamv_gazebo)/launch/rviz_vrx.launch" />  
 
   <!-- launch robot_localization -->

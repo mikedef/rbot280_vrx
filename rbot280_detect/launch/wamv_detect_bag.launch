@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+
+<launch>                                                                                                                        
+                                                                                                                                
+  <arg name="bag_file" default="/home/mikedef/data/2022-02-09-21-55-05_driving-to-dock.bag" />                
+  <arg name="start" default="0" />                       
+  <node pkg="rosbag" name="play" type="play" output="screen" args="--clock                               
+                                                                   -l                                                        
+                                                                   -s $(arg start)        
+                                                                   $(arg bag_file)" />                   
+
+  <arg name="rviz_config" default="$(find rbot280)/rviz/wamv_.rviz" />                                 
+  <node pkg="rviz" type="rviz"                                                                           
+        name="wamv_visualization" args="-d $(arg rviz_config)" />
+
+  <!-- launch lidar clustering -->                                                                    
+  <!-- -->                                                                                             
+  <group ns="lidar_clustering">                                                                
+    <include                                                                                                
+        file="$(find pointcloud_cluster_detect)/launch/pointcloud_cluster_detect.launch">                 
+      <arg name="pc_topic" value="/wamv/sensors/lidars/lidar_wamv/points"/>
+      <arg name="filter_camera_view" value="true"/>
+      <arg name="camera_hfov" value="80" />
+      <arg name="camera_theta" value="0.0" />
+      <arg name="filter_cloud" value="true"/>                            
+      <arg name="remove_points" value="1.0"/>                                                
+      <arg name="downsampled_cloud" value="true"/>                                        
+      <arg name="leaf_size" value="0.1"/>                                             
+      <arg name="clustering_distance" value="1.0"/>                            
+      <arg name="cluster_size_min" value="5"/>                                                              
+      <arg name="cluster_size_max" value="60"/>                                                           
+      <arg name="cluster_seg_thresh" value="10.0"/>                                                              
+      <arg name="drop_cluster_count" value="10"/>
+      <arg name="nmea_msg_header" value="PYLOB"/>
+      <arg name="viz" value="true"/>                                                                                 
+    </include>                                                                               
+  </group> 
+  
+  <!-- launch rviz, static joint transforms, revolute joint static transforms 
+  <include file="$(find wamv_gazebo)/launch/rviz_vrx.launch" />  -->                                                          
+                                                                                                                                        
+  <!-- launch robot_localization 
+       <include file="$(find wamv_gazebo)/launch/localization_example.launch" /> -->
+
+  <!-- Load robot model 
+  <arg name="urdf" default="$(find rbot280)/config/my_wamv.urdf"/>
+  <arg name="thrust_config" default="H" />
+  <arg name="camera_enabled"       default="true" />                                                                                   
+  <arg name="gps_enabled"          default="true" />                                                                                   
+  <arg name="imu_enabled"          default="true" />                                                                                   
+  <arg name="lidar_enabled"        default="true" />                                                                                   
+  <arg name="ground_truth_enabled" default="true" />
+  <arg name="namespace" default="wamv"/> 
+
+  <param name="$(arg namespace)/robot_description"                                                                                      
+         command="$(find xacro)/xacro &#x002D;-&#x002D;-inorder '$(arg urdf)'                                                           
+         thruster_config:=$(arg thrust_config)                                                                                          
+         camera_enabled:=$(arg camera_enabled)                                                                                          
+         gps_enabled:=$(arg gps_enabled)                                                                                                
+         imu_enabled:=$(arg imu_enabled)                                                                                                
+         lidar_enabled:=$(arg lidar_enabled)                                                                                            
+         ground_truth_enabled:=$(arg ground_truth_enabled)                                                                              
+         namespace:=$(arg namespace) "/>    
+  -->
+</launch> 
