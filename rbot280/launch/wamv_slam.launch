@@ -3,19 +3,19 @@
   <arg name="slam_methods" default="gmapping" doc="slam type [gmapping, cartographer, hector]"/>
   <arg name="open_rviz" default="true"/>
 
-  <!-- Publishes static joint transforms (lidar, cameras, etc) to /tf -->                                                     
-  <node ns="wamv" pkg="robot_state_publisher" type="robot_state_publisher" name="rob_st_pub"/>                                  
+  <!-- Publishes static joint transforms (lidar, cameras, etc) to /tf 
+  <node ns="wamv" pkg="robot_state_publisher" type="robot_state_publisher" name="rob_st_pub"/>  -->                                  
   
-  <!-- Publishes revolute joint static transforms (gps and imu) to /tf -->
+  <!-- Publishes revolute joint static transforms (gps and imu) to /tf 
   <node ns="wamv" pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher">
     <param name="gui" value="false" />
-  </node>
+  </node>  -->
 
   <!-- launch robot_localization -->     <!-- -->
   <!-- <include file="$(find rbot280)/launch/wamv_localization.launch" /> -->
 
-  <!-- launch pointcloud to laser scan -->
-  <include file="$(find rbot280)/launch/pointcloud_to_laserscan.launch" />
+  <!-- launch pointcloud to laser scan 
+  <include file="$(find rbot280)/launch/pointcloud_to_laserscan.launch" /> -->
   
   <!-- SLAM: Gmapping, Cartographer, Hector -->
   <include file="$(find rbot280)/launch/wamv_$(arg slam_methods).launch" />

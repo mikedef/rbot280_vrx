@@ -1,0 +1,45 @@
+<launch>
+
+  <!-- launch lidar clustering for the cameras fov-->                                                                                    
+  <group ns="lidar_clustering_center_camera_fov">                                                                                          
+    <include                                                                                                                               
+        file="$(find pointcloud_cluster_detect)/launch/pointcloud_cluster_detect.launch">                                                  
+      <arg name="pc_topic" value="/wamv/sensors/lidars/lidar_wamv/points"/>                                                                
+      <arg name="filter_camera_view" value="true"/>                                                                                        
+      <arg name="camera_hfov" value="80" />                                                                                                
+      <arg name="camera_theta" value="0.0" />                                                                                              
+      <arg name="filter_cloud" value="true"/>                                                                                              
+      <arg name="remove_points" value="1.0"/>                                                                                              
+      <arg name="downsampled_cloud" value="true"/>                                                                                         
+      <arg name="leaf_size" value="0.05"/>                                                                                                 
+      <arg name="clustering_distance" value="1.0"/>                                                                                        
+      <arg name="cluster_size_min" value="5"/>                                                                                             
+      <arg name="cluster_size_max" value="60"/>                                                                                            
+      <arg name="cluster_seg_thresh" value="1.0"/>                                                                                         
+      <arg name="drop_cluster_count" value="10"/>                                                                                          
+      <arg name="viz" value="true"/>                                                                                                       
+    </include>                                                                                                                             
+  </group>                                                                                                                                 
+                                                                                                                                           
+  <group ns="ml_detect_center_camera" >                                                                                                    
+    <include file="$(find vision_ml_detect)/launch/vision_ml_detect.launch">                                                               
+      <arg name="image_src" value="/wamv/sensors/cameras/front_center_camera/image_raw" />                                                 
+      <arg name="image_transport" value="raw"/>                                                                                            
+      <arg name="model_path" value="/home/mikedef/data/yolo/yolov3.weights"/>                                                              
+      <arg name="config_path" value="/home/mikedef/data/yolo/darknet/cfg/yolov3.cfg"/>                                                     
+      <!--<arg name="model_path" value="/home/mikedef/data/yolo/yolov3-tiny.weights"/> -->                                                 
+      <!--<arg name="config_path" value="/home/mikedef/data/yolo/darknet/cfg/yolov3-tiny.cfg"/> -->                                        
+      <arg name="framework" value=""/>                                                                                                     
+      <arg name="classes_path" value="/home/mikedef/data/yolo/darknet/data/coco.names"/>                                                   
+      <arg name="backend" value="0" /> <!-- Cuda '5' OpenCV does not compile with cuda enabled with ROS! -->                               
+      <arg name="target" value="0"/> <!-- Cuda '6' -->                                                                                     
+      <arg name="conf_thr" value="0.2" />                                                                                                  
+      <arg name="nms" value="0.45" />                                                                                                      
+      <arg name="scale" value="0.0039"/>                                                                                                   
+      <arg name="in_width" value="416" />                                                                                                  
+      <arg name="in_height" value="416" />                                                                                                 
+      <arg name="swap_RB" value="false" />                                                                                                 
+    </include>                                                                                                                             
+  </group>   
+
+</launch>

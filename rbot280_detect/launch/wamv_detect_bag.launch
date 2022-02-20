@@ -2,7 +2,7 @@
 
 <launch>                                                                                                                        
                                                                                                                                 
-  <arg name="bag_file" default="/home/mikedef/data/2022-02-09-21-55-05_driving-to-dock.bag" />                
+  <arg name="bag_file" default="/home/mikedef/data/obstacle-buoys.bag" />                
   <arg name="start" default="0" />                       
   <node pkg="rosbag" name="play" type="play" output="screen" args="--clock                               
                                                                    -l                                                        
@@ -13,9 +13,9 @@
   <node pkg="rviz" type="rviz"                                                                           
         name="wamv_visualization" args="-d $(arg rviz_config)" />
 
-  <!-- launch lidar clustering -->                                                                    
+  <!-- launch lidar clustering for the cameras fov-->                                                                    
   <!-- -->                                                                                             
-  <group ns="lidar_clustering">                                                                
+  <group ns="lidar_clustering_center_camera_fov">                                                                
     <include                                                                                                
         file="$(find pointcloud_cluster_detect)/launch/pointcloud_cluster_detect.launch">                 
       <arg name="pc_topic" value="/wamv/sensors/lidars/lidar_wamv/points"/>
@@ -25,16 +25,38 @@
       <arg name="filter_cloud" value="true"/>                            
       <arg name="remove_points" value="1.0"/>                                                
       <arg name="downsampled_cloud" value="true"/>                                        
-      <arg name="leaf_size" value="0.1"/>                                             
+      <arg name="leaf_size" value="0.05"/>                                             
       <arg name="clustering_distance" value="1.0"/>                            
       <arg name="cluster_size_min" value="5"/>                                                              
       <arg name="cluster_size_max" value="60"/>                                                           
-      <arg name="cluster_seg_thresh" value="10.0"/>                                                              
+      <arg name="cluster_seg_thresh" value="1.0"/>                                                              
       <arg name="drop_cluster_count" value="10"/>
-      <arg name="nmea_msg_header" value="PYLOB"/>
       <arg name="viz" value="true"/>                                                                                 
     </include>                                                                               
-  </group> 
+  </group>
+
+  <group ns="ml_detect_center_camera" >
+    <include file="$(find vision_ml_detect)/launch/vision_ml_detect.launch">
+      <arg name="image_src" value="/wamv/sensors/cameras/front_center_camera/image_raw" />
+      <arg name="image_transport" value="raw"/>
+      <arg name="model_path" value="/home/mikedef/data/yolo/yolov3.weights"/> 
+      <arg name="config_path" value="/home/mikedef/data/yolo/darknet/cfg/yolov3.cfg"/> 
+      <!--<arg name="model_path" value="/home/mikedef/data/yolo/yolov3-tiny.weights"/> -->
+      <!--<arg name="config_path" value="/home/mikedef/data/yolo/darknet/cfg/yolov3-tiny.cfg"/> -->
+      <arg name="framework" value=""/>
+      <arg name="classes_path" value="/home/mikedef/data/yolo/darknet/data/coco.names"/>
+      <arg name="backend" value="0" /> <!-- Cuda '5' OpenCV does not compile with cuda enabled with ROS! --> 
+      <arg name="target" value="0"/> <!-- Cuda '6' -->
+      <arg name="conf_thr" value="0.2" />
+      <arg name="nms" value="0.45" />
+      <arg name="scale" value="0.0039"/>
+      <arg name="in_width" value="416" />
+      <arg name="in_height" value="416" />
+      <arg name="swap_RB" value="false" />
+    </include>
+  </group>
+
+
   
   <!-- launch rviz, static joint transforms, revolute joint static transforms 
   <include file="$(find wamv_gazebo)/launch/rviz_vrx.launch" />  -->                                                          
