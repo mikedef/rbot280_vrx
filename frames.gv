@@ -1,7 +1,7 @@
 digraph G {
 "wamv/odom" -> "utm"[label=" Broadcaster: /wamv/robot_localization/navsat_transform_node\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
 "wamv/base_link" -> "wamv/front_center_camera_post_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
-"wamv/odom" -> "wamv/base_link"[label=" Broadcaster: /wamv/robot_localization/ekf_localization\nAverage rate: 15.201\nBuffer length: 4.934\nMost recent transform: 291.267\nOldest transform: 286.333\n"];
+"wamv/odom" -> "wamv/base_link"[label=" Broadcaster: /wamv/robot_localization/ekf_localization\nAverage rate: 60.193\nBuffer length: 4.984\nMost recent transform: 125.728\nOldest transform: 120.744\n"];
 "wamv/base_link" -> "wamv/front_left_camera_post_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
 "wamv/base_link" -> "wamv/front_right_camera_post_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
 "wamv/base_link" -> "wamv/lidar_wamv_post_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
@@ -20,14 +20,14 @@ digraph G {
 "wamv/lidar_wamv_post_arm_link" -> "wamv/lidar_wamv_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
 "wamv/lidar_wamv_post_link" -> "wamv/lidar_wamv_post_arm_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
 "wamv/base_link" -> "wamv/right_battery_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
-"wamv/base_link" -> "wamv/gps_wamv_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10.204\nBuffer length: 4.9\nMost recent transform: 291.2\nOldest transform: 286.3\n"];
-"wamv/base_link" -> "wamv/imu_wamv_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10.204\nBuffer length: 4.9\nMost recent transform: 291.2\nOldest transform: 286.3\n"];
-"wamv/base_link" -> "wamv/left_engine_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 49.95\nBuffer length: 4.965\nMost recent transform: 291.265\nOldest transform: 286.3\n"];
-"wamv/left_engine_link" -> "wamv/left_propeller_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 49.95\nBuffer length: 4.965\nMost recent transform: 291.265\nOldest transform: 286.3\n"];
-"wamv/base_link" -> "wamv/right_engine_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 49.95\nBuffer length: 4.965\nMost recent transform: 291.265\nOldest transform: 286.3\n"];
-"wamv/right_engine_link" -> "wamv/right_propeller_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 49.95\nBuffer length: 4.965\nMost recent transform: 291.265\nOldest transform: 286.3\n"];
+"wamv/base_link" -> "wamv/left_engine_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 50.201\nBuffer length: 4.98\nMost recent transform: 125.627\nOldest transform: 120.647\n"];
+"wamv/left_engine_link" -> "wamv/left_propeller_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 50.201\nBuffer length: 4.98\nMost recent transform: 125.627\nOldest transform: 120.647\n"];
+"wamv/base_link" -> "wamv/right_engine_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 50.201\nBuffer length: 4.98\nMost recent transform: 125.627\nOldest transform: 120.647\n"];
+"wamv/right_engine_link" -> "wamv/right_propeller_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 50.201\nBuffer length: 4.98\nMost recent transform: 125.627\nOldest transform: 120.647\n"];
+"wamv/base_link" -> "wamv/gps_wamv_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10.204\nBuffer length: 4.9\nMost recent transform: 125.6\nOldest transform: 120.7\n"];
+"wamv/base_link" -> "wamv/imu_wamv_link"[label=" Broadcaster: /wamv/rob_st_pub\nAverage rate: 10.204\nBuffer length: 4.9\nMost recent transform: 125.6\nOldest transform: 120.7\n"];
 edge [style=invis];
  subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
-"Recorded at time: 291.289"[ shape=plaintext ] ;
+"Recorded at time: 125.646"[ shape=plaintext ] ;
 }->"wamv/odom";
 }

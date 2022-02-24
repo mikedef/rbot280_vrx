@@ -52,18 +52,24 @@
     <arg name="extra_gazebo_args" value="$(arg extra_gazebo_args)"/>
   </include>
 
-  <!-- Load robot model 
-  <arg name="urdf" default="$(env HOME)/catkin_ws/src/vrx/my_wamv/my_wamv.urdf"/>  -->
+  
   <arg name="urdf" default="$(find rbot280)/config/my_wamv.urdf"/>
 
-  <!-- launch rviz, static joint transforms, revolute joint static transforms 
-  <include file="$(find wamv_gazebo)/launch/rviz_vrx.launch" /> --> 
+  <!-- launch rviz, static joint transforms, revolute joint static transforms -->
+  <include file="$(find wamv_gazebo)/launch/rviz_vrx.launch" />  
 
-  <!-- launch robot_localization 
-  <include file="$(find wamv_gazebo)/launch/localization_example.launch" /> -->
+  <!-- launch robot_localization -->
+  <!--<include file="$(find wamv_gazebo)/launch/localization_example.launch" />-->
+  <include file="$(find rbot280)/launch/wamv_localization.launch" />
 
-  <!-- launch pointcloud_to_laserscan 
-  <include file="$(find wamv_gazebo)/launch/pointcloud-to-laserscan.launch" /> -->
+  <!-- Run the map server and launch map -->
+  <node name="map_server" pkg="map_server" type="map_server"
+	args="$(find rbot280)/maps/gmapping_5.yaml"/>
+  <!-- Run a static transform between wamv/odom and /map -->
+  <node pkg="tf" type="static_transform_publisher" name="odom_map_broadcaster" args="0 0 0 0 0 0 map wamv/odom 100" /> 
+
+  <!-- launch pointcloud_to_laserscan -->
+  <include file="$(find wamv_gazebo)/launch/pointcloud-to-laserscan.launch" /> 
     
   <param name="$(arg namespace)/robot_description"
          command="$(find xacro)/xacro &#x002D;&#x002D;inorder '$(arg urdf)'
