@@ -5,15 +5,15 @@
     <include                                                                                                                               
         file="$(find pointcloud_cluster_detect)/launch/pointcloud_cluster_detect.launch">                                                  
       <arg name="pc_topic" value="/wamv/sensors/lidars/lidar_wamv/points"/>                                                                
-      <arg name="filter_camera_view" value="true"/>                                                                                        
+      <arg name="filter_camera_view" value="false"/>                                                                                       
       <arg name="camera_hfov" value="80" />                                                                                                
       <arg name="camera_theta" value="0.0" />                                                                                              
       <arg name="filter_cloud" value="true"/>                                                                                              
       <arg name="remove_points" value="1.0"/>                                                                                              
       <arg name="downsampled_cloud" value="true"/>                                                                                         
-      <arg name="leaf_size" value="0.05"/>                                                                                                 
-      <arg name="clustering_distance" value="1.0"/>                                                                                        
-      <arg name="cluster_size_min" value="5"/>                                                                                             
+      <arg name="leaf_size" value="0.1"/>                                                                                                 
+      <arg name="clustering_distance" value="0.05"/>                                                                                       
+      <arg name="cluster_size_min" value="4"/>                                                                                             
       <arg name="cluster_size_max" value="60"/>                                                                                            
       <arg name="cluster_seg_thresh" value="1.0"/>                                                                                         
       <arg name="drop_cluster_count" value="10"/>                                                                                          
