@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- Run AMCL -->
+  <include file="$(find rbot280)/launch/wamv_amcl.launch" />
+
+  <!-- Run move_base -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base_node" output="screen">
+    <rosparam file="$(find rbot280)/params/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find rbot280)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find rbot280)/params/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find rbot280)/params/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find rbot280)/params/base_local_planner_params.yaml" command="load" />
+  </node>
+
+</launch>
