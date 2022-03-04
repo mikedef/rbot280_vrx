@@ -1,12 +1,24 @@
-obstacle_range: 2.5
-raytrace_range: 3.0
-footprint: [[-2, -4], [-2, 4], [2,4], [2,-4]]
-inflation_radius: 0.55
+obstacle_range: 50.0  # obstacle range that an obstacle will be put in cost map
+raytrace_range: 55.0  # clear out space
+footprint: [[-4, -2], [-4, 2], [4, 2], [4, -2]]
+inflation_radius: 0.55  # 
 
 observation_sources: laser_scan_sensor point_cloud_sensor
 
 laser_scan_sensor: {
-  sensor_frame: velodyne,
+  sensor_frame: wamv/lidar_wamv_link,
   data_type: LaserScan,
-  topic: /sensors/
+  topic: wamv/sensors/lidars/lidar_wamv/scan,
+  marking: true,
+  clearing: true
 }
+
+point_cloud_sensor: {
+  sensor_frame: wamv/lidar_wamv_link,
+  data_type: PointCloud,
+  topic: wamv/sensors/lidars/lidar_wamv/points,
+  marking: true,
+  clearing: true  
+}
+
+

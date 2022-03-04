@@ -59,17 +59,16 @@
   <include file="$(find wamv_gazebo)/launch/rviz_vrx.launch" />  
 
   <!-- launch robot_localization -->
-  <!--<include file="$(find wamv_gazebo)/launch/localization_example.launch" />-->
-  <include file="$(find rbot280)/launch/wamv_localization.launch" />
+  <include file="$(find rbot280)/launch/wamv_localization.launch" /> 
 
   <!-- Run the map server and launch map -->
   <node name="map_server" pkg="map_server" type="map_server"
-	args="$(find rbot280)/maps/gmapping_5.yaml"/>
+	args="$(find rbot280)/maps/gmapping_5.yaml"/> 
   <!-- Run a static transform between wamv/odom and /map -->
   <node pkg="tf" type="static_transform_publisher" name="odom_map_broadcaster" args="0 0 0 0 0 0 map wamv/odom 100" /> 
 
   <!-- launch pointcloud_to_laserscan -->
-  <include file="$(find wamv_gazebo)/launch/pointcloud-to-laserscan.launch" /> 
+  <include file="$(find rbot280)/launch/pointcloud_to_laserscan.launch" /> 
     
   <param name="$(arg namespace)/robot_description"
          command="$(find xacro)/xacro &#x002D;&#x002D;inorder '$(arg urdf)'
