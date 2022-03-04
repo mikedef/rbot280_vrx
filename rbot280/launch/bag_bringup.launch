@@ -2,7 +2,7 @@
 
 <launch>                                                                                                                        
                                                                                                                                 
-  <arg name="bag_file" default="/home/mikedef/data/2022-03-02-14-04-33.bag" />                
+  <arg name="bag_file" default="/home/mikedef/data/test.bag" />                
   <arg name="start" default="0" />                       
   <node pkg="rosbag" name="play" type="play" output="screen" args="--clock                               
                                                                    -l                                                        
@@ -14,7 +14,7 @@
         name="wamv_visualization" args="-d $(arg rviz_config)" />
   
   <!-- launch pointcloud_to_laserscan -->                                                        
-  <include file="$(find wamv_gazebo)/launch/pointcloud-to-laserscan.launch" />
+  <include file="$(find rbot280)/launch/pointcloud_to_laserscan.launch" />
 
   <!-- launch robot_localization -->                                                             
   <include file="$(find rbot280)/launch/wamv_localization.launch" />
