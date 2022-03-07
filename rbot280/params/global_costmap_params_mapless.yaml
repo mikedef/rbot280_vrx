@@ -1,10 +1,11 @@
 global_costmap:
   global_frame: wamv/odom  #map
   robot_base_frame: wamv/base_link
+  track_unknown_space: true
   update_frequency: 3.0
   publish_frequency: 1.0
-  static_map: true
-  rolling_window: false
+  static_map: false
+  rolling_window: true
   transform_tolerance: 5.0
   resolution: 0.75
   map_type: costmap

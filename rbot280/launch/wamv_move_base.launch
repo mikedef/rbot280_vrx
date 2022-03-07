@@ -20,8 +20,14 @@
     <rosparam file="$(find rbot280)/params/teb_local_planner_params.yaml" command="load" /> 
     <rosparam file="$(find rbot280)/params/base_local_planner_params.yaml" command="load" />
             
-    <remap from="cmd_vel" to="$(arg cmd_vel_topic)" />
-    
+    <remap from="cmd_vel" to="$(arg cmd_vel_topic)" />    
   </node>
 
+  <!-- launch wamv control -->
+       <include file="$(find rbot280)/launch/wamv_control.launch" /> 
+  <!-- This package is more for gazebo only. Need to write my own controller here I think
+  <rosparam file="$(find rbot280)/params/control.yaml" command="load" />
+  <node name="wamv_base_controller_spawner" pkg="controller_manager" type="spawner"
+	output="screen" args="wamv_velocity_controller"/> -->
+  
 </launch>
