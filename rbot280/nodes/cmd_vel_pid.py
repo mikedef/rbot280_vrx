@@ -9,13 +9,13 @@ velocity commands to next waypoint on path. Will republish updated velocity comm
 
 import rospy
 import math
-import geometry_msgs.msg import Twist
-import sensor_msgs.msg import Imu  # Might not use Imu since I have pose data from the localization EKF ***
-import nav_msgs.msg import Odometry, Plan
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import Imu  # Might not use Imu since I have pose data from the localization EKF ***
+from nav_msgs.msg import Odometry, Path
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 import tf
 from dynamic_reconfigure.server import Server
-from rbot280.config import Cmd_Vel_PID
+from rbot280.cfg import CmdVelPIDConfig
 
 
 class Cmd_Vel_PID(object):
@@ -41,7 +41,7 @@ class Cmd_Vel_PID(object):
         # Subscribers
         rospy.Subscriber("cmd_vel", Twist, callback=self.cmd_vel_cb, queue_size=10)
         # Start with global planner but try to transition to local path planner
-        rospy.Subscriber("move_base_node/GlobalPlanner/plan", Plan, callback=goal_cb, queue_size=10)
+        rospy.Subscriber("move_base_node/GlobalPlanner/plan", Path, callback=self.goal_cb, queue_size=10)
 
         # Publishers
         cmd_vel_pid_pub = rospy.Publisher("cmd_vel/pid", Twist, queue_size=10)
@@ -66,11 +66,11 @@ class Cmd_Vel_PID(object):
             cmd_vel_pid_pub.publish(cmd_vel_pid_msg)
             r.sleep()
 
-    def pid_linear(self, msg):
+    def pid_linear(self):
         """ Linear PID """
         return 1.0
 
-    def pid_angular(self, msg):
+    def pid_angular(self):
         """ Angular PID """
         return 0.0
 
@@ -95,13 +95,15 @@ class Cmd_Vel_PID(object):
         """ cmd_vel_cb from the subscriber to get pose data """
         self.linear_x = msg.linear.x  # Forward velocity (m/s)
         self.angular_z = msg.angular.z  # Rotational velocity (rad/s)
+        #rospy.loginfo("x: %f, y: %f", self.linear_x, self.angular_z)
 
     def goal_cb(self, msg):
-        rospy.loginfo(msg.poses[0].pose)  # Figure out what is being published here and use the first as the first pose as the goal
+        rospy.loginfo(msg.poses[0].pose.position.x)  # Figure out what is being published here and use the first as the first pose as the goal
+        
 
-    if __name__ == '__main__':
-        try:
-            cmd_vel_pid = Cmd_Vel_PID()
-
-        except KeyboardInterrupt, rospyROSInterruptException:
-            pass
+if __name__ == '__main__':
+    try:
+        cmd_vel_pid = Cmd_Vel_PID()
+        
+    except rospy.ROSInterruptException:
+        pass
