@@ -379,6 +379,12 @@
       </thruster>
     </plugin>
   </gazebo>
+  <!-- custom plugin -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/wamv</robotNamespace>
+    </plugin>
+  </gazebo>
   <!--Gazebo Plugin for simulating WAM-V dynamics-->
   <gazebo>
     <plugin filename="libusv_gazebo_dynamics_plugin.so" name="usv_dynamics_wamv_dynamics_plugin">

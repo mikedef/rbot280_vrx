@@ -1,23 +1,33 @@
+controller_frequency: 3.0
+recovery_behavior_enabled: true     # might want to turn this off
+clearing_rotation_allowed: false
+
 TrajectoryPlannerROS:
 
 # Robot Configuration Parameters
-  max_vel_x: 2.5  # The maximum forward velocity allowed for the base in m/s 
-  min_vel_x: 0.1  # The minimum forward velocity allowed for the base in m/s. Must be set a min to overcome friction 
+  max_vel_x: 2.5  # 5km/h=1.3m/s, The maximum forward velocity allowed for the base in m/s 
+  min_vel_x: 0.1  # The minimum forward velocity allowed for the base in m/s. Must be set a min to overcome friction
+  max_vel_y: 0.0  # 0 for differentail drive robot
+  min_vel_y: 0.0
   max_vel_theta: 1.0  # Maximum rotational velocity allowed for the base in rad/s
-  min_in_place_vel_theta: 0.4  # Maximum rotational velocity while performing in-place rotations in rad/s
-  acc_lim_theta: 3.2  # rotational acc limit of the robot in m/s^2
+  min_vel_theta: -1.0
+  min_in_place_vel_theta: 0.5  # Maximum rotational velocity while performing in-place rotations in rad/s
+  max_rotation_vel: 2.0
+  acc_lim_theta: 2.0  # rotational acc limit of the robot in m/s^2
   acc_lim_x: 2.5  # x acc limit in m/s^2
-  acc_lim_y: 2.5  # y acc limit in m/s^2
+  acc_lim_y: 0.0  # 0 for diff robot, y acc limit in m/s^2
 
 # Differential-drive robot configuration
   holonomic_robot: false
 
 # Goal Tolerance Parameters
-  xy_goal_tolerance: 0.10  # tolerance in meters for the controller in the x & y distance when achieving a goal
-  yaw_goal_tolerance: 0.05  # tolerance in rads for the controller in yaw/rotation when achieving its goal
+  xy_goal_tolerance: 0.50  # 50cm, tolerance in meters for the controller in the x & y distance when achieving a goal
+  yaw_goal_tolerance: 0.4  # ~24 degrees, tolerance in rads for the controller in yaw/rotation when achieving its goal
 
 # Forward Simulation Parameters
-  sim_time: 0.8  # amount of time to forward-simulate trajectories in seconds
-  vx_samples: 18  # number of samples to use when exploring the x velocity space
+  sim_time: 1.8  # amount of time to forward-simulate trajectories in seconds
+  vx_samples: 8  # number of samples to use when exploring the x velocity space
+  vy_samples: 0  # diff robot
   vtheta_samples: 20  # number of samples to use when exploring the theta velocity space
   sim_granularity: 0.05  # step size, in meters, to take between points on a given trajectory
+  dwa: true

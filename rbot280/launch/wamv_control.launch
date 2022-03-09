@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="max_angle" default="$(eval pi/2)"/>
+  <arg name="thrust_config" default="H"/>
+  <arg name="namespace" default="wamv"/>
+  <arg name="linear_scaling" default="0.1" />
+  <arg name="angular_scaling" default="0.05" />
+
+  <group if="$(eval (arg('thrust_config') == 'H' or arg('thrust_config') == 'T') )">
+        <!-- Convert Twist messages (from keyboard teleop) to Drive messages -->
+    <!-- <node pkg="rbot280" type="twist2thrust.py" name="twist2thrust" output="screen" args="keyboard"> -->
+    <node pkg="rbot280" type="twist2thrust.py" name="twist2thrust" output="screen" args="--keyboard">
+      <param name="linear_scaling" value="$(arg linear_scaling)" />
+      <param name="angular_scaling" value="$(arg angular_scaling)" />
+      <remap from="left_cmd" to="/$(arg namespace)/thrusters/left_thrust_cmd"/>
+      <remap from="right_cmd" to="/$(arg namespace)/thrusters/right_thrust_cmd"/>
+    </node>
+  </group>
+
+</launch>

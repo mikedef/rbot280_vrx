@@ -14,20 +14,20 @@
     <rosparam file="$(find rbot280)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find rbot280)/params/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find rbot280)/params/local_costmap_params.yaml" command="load" />
-    <!-- For the standard Dynamic Window Approach (DWA) approach to local control
-	 <rosparam file="$(find rbot280)/params/base_local_planner_params.yaml" command="load" /> -->
-
-    <!-- For the DWA 
+    <rosparam file="$(find rbot280)/params/global_planner_params.yaml" command="load" />
+    <rosparam file="$(find rbot280)/params/move_base_params.yaml" command="load" />
     <rosparam file="$(find rbot280)/params/dwa_local_planner_params.yaml" command="load" />
-    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" /> -->
-
-    <!-- For the TEB 
-    <rosparam file="$(find rbot280)/params/teb_local_planner_params.yaml" command="load" /> --> <!-- need to create this file -->
-    <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-    
-
-    <remap from="cmd_vel" to="$(arg cmd_vel_topic)" />
-    
+    <rosparam file="$(find rbot280)/params/teb_local_planner_params.yaml" command="load" /> 
+    <rosparam file="$(find rbot280)/params/base_local_planner_params.yaml" command="load" />
+            
+    <remap from="cmd_vel" to="$(arg cmd_vel_topic)" />    
   </node>
 
+  <!-- launch wamv control -->
+       <include file="$(find rbot280)/launch/wamv_control.launch" /> 
+  <!-- This package is more for gazebo only. Need to write my own controller here I think
+  <rosparam file="$(find rbot280)/params/control.yaml" command="load" />
+  <node name="wamv_base_controller_spawner" pkg="controller_manager" type="spawner"
+	output="screen" args="wamv_velocity_controller"/> -->
+  
 </launch>
