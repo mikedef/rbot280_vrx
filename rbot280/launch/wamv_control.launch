@@ -8,13 +8,32 @@
 
   <group if="$(eval (arg('thrust_config') == 'H' or arg('thrust_config') == 'T') )">
         <!-- Convert Twist messages (from keyboard teleop) to Drive messages -->
-    <!-- <node pkg="rbot280" type="twist2thrust.py" name="twist2thrust" output="screen" args="keyboard"> -->
-    <node pkg="rbot280" type="twist2thrust.py" name="twist2thrust" output="screen" args="--keyboard">
-      <param name="linear_scaling" value="$(arg linear_scaling)" />
-      <param name="angular_scaling" value="$(arg angular_scaling)" />
-      <remap from="left_cmd" to="/$(arg namespace)/thrusters/left_thrust_cmd"/>
-      <remap from="right_cmd" to="/$(arg namespace)/thrusters/right_thrust_cmd"/>
-    </node>
+	<!-- <node pkg="rbot280" type="twist2thrust.py" name="twist2thrust" output="screen" args="keyboard"> -->
+	<!--
+	    <node pkg="rbot280" type="twist2thrust.py" name="twist2thrust" output="screen" args="keyboard">
+	    <param name="linear_scaling" value="$(arg linear_scaling)" />
+	    <param name="angular_scaling" value="$(arg angular_scaling)" />
+	    <remap from="left_cmd" to="/$(arg namespace)/thrusters/left_thrust_cmd"/>
+	    <remap from="right_cmd" to="/$(arg namespace)/thrusters/right_thrust_cmd"/>
+	    </node>
+	-->
   </group>
+
+  <node pkg="rbot280" type="diff_drive_control.py"
+	name="diff_drive_control" output="screen">
+    <!-- set inital pid gains -->
+    <!-- velocity twist -->
+    <param name='velKp' value='0.1'/>
+    <param name='velKi' value='0.0'/>
+    <param name='velKd' value='0.0'/>
+    <!-- yaw torque pid gains -->
+    <param name='yawKp' value='0.1'/>
+    <param name='yawKi' value='0.0'/>
+    <param name='yawKd' value='0.0'/>
+
+    <!-- remap to make more generic -->
+
+  </node>
+  
 
 </launch>
