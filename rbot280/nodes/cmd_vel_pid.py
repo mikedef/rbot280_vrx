@@ -9,7 +9,7 @@ velocity commands to next waypoint on path. Will republish updated velocity comm
 
 import rospy
 import math
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Quaternion
 from sensor_msgs.msg import Imu  # Might not use Imu since I have pose data from the localization EKF ***
 from nav_msgs.msg import Odometry, Path
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
@@ -26,7 +26,7 @@ class Cmd_Vel_PID(object):
     angular_ki = 1  # angular integral constant
     angular_kd = 1  # angular derivative constant
     angular_z, linear_x = 0, 0  # value from cmd_vel
-    odom_x, odom_y, odom_yaw = 0, 0, 0  # robot pose and position
+    robot_x, robot_y, robot_yaw = 0, 0, 0  # robot pose and position from robot_localization Odometry
     goal_x, goal_y, goal_yaw = 0, 0, 0  # goal pose and position
 
     # *************** Review thresholds for PID *************************************
@@ -42,6 +42,7 @@ class Cmd_Vel_PID(object):
         rospy.Subscriber("cmd_vel", Twist, callback=self.cmd_vel_cb, queue_size=10)
         # Start with global planner but try to transition to local path planner
         rospy.Subscriber("move_base_node/GlobalPlanner/plan", Path, callback=self.goal_cb, queue_size=10)
+        rospy.Subscriber("wamv/robot_localization/odometry/filtered", Odometry, callback=self.robot_cb, queue_size=10)
 
         # Publishers
         cmd_vel_pid_pub = rospy.Publisher("cmd_vel/pid", Twist, queue_size=10)
@@ -51,7 +52,7 @@ class Cmd_Vel_PID(object):
 
         # init pid vars
         # linear
-        self.error_x = 0.0
+        self.error_linear = 0.0
         # setpoint desired_velocity
 
         # angular
@@ -68,17 +69,22 @@ class Cmd_Vel_PID(object):
 
     def pid_linear(self):
         """ Linear PID """
+        # self.error_linear
+        # self.desired_velocity_x
+        self.error_linear = math.sqrt((self.goal_y - self.robot_y)**2 + (self.goal_x - self.robot_x)**2)
         return 1.0
 
     def pid_angular(self):
         """ Angular PID """
+        # self.desired_yaw
+        # self.error_yaw
         return 0.0
 
     def dynamic_callback(self, config, level):
         rospy.loginfo("""Reconfigure Request: \
         {linear_kp}, {linear_ki}, {linear_kp}, \
         {angular_kp}, {angular_ki}, {angular_kp}, \
-        {desired_velocity} """.format(**config))
+        {desired_velocity_x} """.format(**config))
 
         self.linear_kp = config['linear_kp']
         self.linear_ki = config['linear_ki']
@@ -87,7 +93,7 @@ class Cmd_Vel_PID(object):
         self.angular_ki = config['angular_ki']
         self.angular_kd = config['angular_kd']
 
-        self.desired_velocity = config['desired_velocity']
+        self.desired_velocity_x = config['desired_velocity_x']
 
         return config
 
@@ -98,7 +104,23 @@ class Cmd_Vel_PID(object):
         #rospy.loginfo("x: %f, y: %f", self.linear_x, self.angular_z)
 
     def goal_cb(self, msg):
-        rospy.loginfo(msg.poses[0].pose.position.x)  # Figure out what is being published here and use the first as the first pose as the goal
+        #rospy.loginfo(msg.poses[0].pose.orientation.z)  # Figure out what is being published here and use the first as the first pose as the goal
+        self.goal_x = msg.poses[0].pose.position.x
+        self.goal_y = msg.poses[0].pose.position.y
+        q = msg.poses[0].pose.orientation
+        _, _, self.goal_yaw = euler_from_quaternion((q.x, q.y, q.z, q.w))
+
+        self.error_linear = 0.0  # reset linear error
+
+        self.desired_yaw = 0.0  # reset desired yaw
+        self.error_yaw = 0.0  # reset yaw error
+
+    def robot_cb(self, msg):
+        rospy.loginfo(msg.pose)
+        self.robot_x = msg.pose.position.x
+        self.robot_y = msg.pose.position.y
+        q = msg.pose.orientation
+        _, _, self.robot_yaw = euler_from_quaternion((q.x, q.y, q.z, q.w))
         
 
 if __name__ == '__main__':
