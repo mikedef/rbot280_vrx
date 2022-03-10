@@ -28,4 +28,13 @@ if __name__ == '__main__':
     velKi = rospy.get_param('~velKi', 0.0)
     velKd = rospy.get_param('~velKd', 0.0)
 
-    yawKp = rospy.get_param(
+    yawKp = rospy.get_param('~yawKp', 0.0)
+    yawKi = rospy.get_param('~yawKi', 0.0)
+    yawKd = rospy.get_param('~yawKd', 0.0)
+
+    # Init Cmd_Vel_PID object - creats a PID object
+    pid = Cmd_Vel_PID()
+
+    # Setup gains from params
+    pid.vpid.Kp = velKp
+    pid.vpid.
