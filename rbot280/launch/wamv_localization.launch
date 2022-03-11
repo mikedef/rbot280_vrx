@@ -15,7 +15,7 @@
     <param name="base_link_frame" value="wamv/base_link"/>
     <param name="world_frame" value="wamv/odom"/>
     <param name="publish_tf" value="true"/>
-    <param name="frequency" value="60"/>
+    <param name="frequency" value="20"/>
     <param name="reset_on_time_jump" value="true" />  <!-- For looping bagfiles -->
     <param name="predict_to_current_time" value="true" />
     <param name="imu0_queue_size" value="100" />
@@ -85,8 +85,8 @@
   <node ns="wamv/robot_localization" pkg="robot_localization" type="navsat_transform_node"
         name="navsat_transform_node" respawn="true" output="screen">      
     <param name="tf_prefix" value="wamv"/> 
-    <param name="frequency" value="60"/>
-    <param name="delay" value="10" />  <!-- delay before calculation of the transform from utm frame to world frame -->
+    <param name="frequency" value="10"/>
+    <param name="delay" value="20" />  <!-- delay before calculation of the transform from utm frame to world frame -->
     <param name="zero_altitude" value="true" />
     <param name="magnetic_declination_radians" value="0"/>  <!-- Is this ok since it's a simulation? -->
     <param name="broadcast_cartesian_transform" value="true"/>

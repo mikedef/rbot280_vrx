@@ -17,7 +17,7 @@
 	
 
 
-  <node pkg="rbot280" type="diff_drive_control_vel.py"
+  <node pkg="rbot280" type="diff_drive_control.py"
 	name="diff_drive_control" output="screen">
     <!-- set inital pid gains -->
     <!-- velocity twist -->
@@ -25,13 +25,14 @@
     <param name='velKi' value='0.0'/>
     <param name='velKd' value='0.0'/>
     <!-- yaw torque pid gains -->
-    <param name='yawKp' value='1.0'/>
+    <param name='yawKp' value='11.0'/>
     <param name='yawKi' value='0.001'/>
     <param name='yawKd' value='0.0'/>
 
     <!-- remap to make more generic -->
     <remap to="/$(arg namespace)/thrusters/left_thrust_cmd" from="left_thrust_cmd"/>
     <remap to="/$(arg namespace)/thrusters/right_thrust_cmd" from="right_thrust_cmd"/>
+
   </node>
   
 

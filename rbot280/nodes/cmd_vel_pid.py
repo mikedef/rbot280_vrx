@@ -10,28 +10,28 @@ velocity commands to next waypoint on path. Will republish updated velocity comm
 import rospy
 import math
 from geometry_msgs.msg import Twist, Quaternion
-from sensor_msgs.msg import Imu  # Might not use Imu since I have pose data from the localization EKF ***
+from std_msgs.msg import Float32
 from nav_msgs.msg import Odometry, Path
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 import tf
 from dynamic_reconfigure.server import Server
-from rbot280.cfg import CmdVelPIDConfig
+from rbot280.cfg import CmdVelPIDDynamicConfig
 
 
 class Cmd_Vel_PID(object):
-    linear_kp = 1  # linear proportional constant
-    linear_ki = 1  # linear integral constant
-    linear_kd = 1  # linear derivative constant
-    angular_kp = 1  # angular proportional constant
-    angular_ki = 1  # angular integral constant
-    angular_kd = 1  # angular derivative constant
+    velKp = 1.0  # linear proportional constant
+    velKi = 0.0  # linear integral constant
+    velKd = 0.0  # linear derivative constant
+    yawKp = 1.0  # angular proportional constant
+    yawKi = 0.0  # angular integral constant
+    yawKd = 0.0  # angular derivative constant
     angular_z, linear_x = 0, 0  # value from cmd_vel
     robot_x, robot_y, robot_yaw = 0, 0, 0  # robot pose and position from robot_localization Odometry
     goal_x, goal_y, goal_yaw = 0, 0, 0  # goal pose and position
 
     # *************** Review thresholds for PID *************************************
     linear_threshold = 5.0
-    linear_velocity_threshold = 2
+    vel_thresh = 2
     angular_velocity_threshold = 1.5
 
     def __init__(self):
@@ -43,13 +43,29 @@ class Cmd_Vel_PID(object):
         # Start with global planner but try to transition to local path planner
         rospy.Subscriber("move_base_node/GlobalPlanner/plan", Path, callback=self.goal_cb, queue_size=10)
         rospy.Subscriber("wamv/robot_localization/odometry/filtered", Odometry, callback=self.robot_cb, queue_size=10)
+    
+        # Publishers                                                                                                         
+        self.left_pub = rospy.Publisher('wamv/thrusters/left_thrust_cmd', Float32, queue_size=1)                             
+        self.right_pub = rospy.Publisher('wamv/thrusters/right_thrust_cmd', Float32, queue_size=1)                           
+        self.vpubdebug_error = rospy.Publisher("vel_pid_debug/error",Float32,queue_size=10)                                 
+        self.vpubdebug_setpoint = rospy.Publisher("vel_pid_debug/setpoint",Float32,queue_size=10)
+        self.ypubdebug_error = rospy.Publisher("yaw_pid_debug/error",Float32,queue_size=10)                              
+        self.ypubdebug_setpoint = rospy.Publisher("yaw_pid_debug/setpoint",Float32,queue_size=10)
 
-        # Publishers
-        cmd_vel_pid_pub = rospy.Publisher("cmd_vel/pid", Twist, queue_size=10)
-
-        cmd_vel_pid_msg = Twist()
-        self.tf_listener = tf.TransformListener()   # Do I need to transform or is everything in Odom fram already?
-
+        # Dynamic Configure                                                                                              
+        self.srv = Server(CmdVelPIDDynamicConfig, self.dynamic_cb) 
+        
+        # ROS Params                                                                                                         
+        self.velKp = rospy.get_param('~velKp', 0.0)                                                                         
+        self.velKi = rospy.get_param('~velKi', 0.0)                                                                          
+        self.velKd = rospy.get_param('~velKd', 0.0)
+        self.yawKp = rospy.get_param('~yawKp', 0.0)
+        self.yawKi = rospy.get_param('~yawKi', 0.0)
+        self.yawKd = rospy.get_param('~yawKd', 0.0)
+        
+        # Msg out for left and right thrusters                                                                               
+        self.left_cmd = Float32()                                                                                            
+        self.right_cmd = Float32()                                                                                                
         # init pid vars
         # linear
         self.error_linear = 0.0
@@ -61,18 +77,67 @@ class Cmd_Vel_PID(object):
 
         while not rospy.is_shutdown():
 
-            cmd_vel_pid_msg.linear.x = self.pid_linear()
-            cmd_vel_pid_msg.angular.z = self.pid_angular()
+            #cmd_vel_pid_msg.linear.x = self.pid_linear()
+            #cmd_vel_pid_msg.angular.z = self.pid_angular()
+            #cmd_vel_pid_pub.publish(cmd_vel_pid_msg)
+            
 
-            cmd_vel_pid_pub.publish(cmd_vel_pid_msg)
+            
             r.sleep()
 
-    def pid_linear(self):
+    def pid(self):
         """ Linear PID """
         # self.error_linear
         # self.desired_velocity_x
         self.error_linear = math.sqrt((self.goal_y - self.robot_y)**2 + (self.goal_x - self.robot_x)**2)
-        return 1.0
+        p = self.error_linear * self.velKp
+        rospy.loginfo("error * Kp: %f * %f = %f"%(self.error_linear, self.velKp, p))
+        rospy.loginfo("p term: %f"%p)
+
+        if self.error_linear < self.linear_threshold:
+            pid_linear_x = p # + i + d
+        else:
+            pid_linear_x = 0.0
+        
+        thrust = self.linear_x + pid_linear_x
+
+        if thrust > self.vel_thresh:
+            thrust = self.vel_thresh
+        elif thrust < -self.vel_thresh:
+            thrust = -self.vel_thresh
+        rospy.loginfo("thrust: %f"%thrust)
+
+        """ Angular PID """
+        angle_error = math.atan2(self.goal_y - self.robot_y, self.goal_x - self.robot_x) - self.robot_yaw
+        # map to -pi to pi
+        self.error_angular = math.atan2(math.sin(angle_error), math.cos(angle_error))
+        yaw_p = self.yawKp * self.error_angular
+        rospy.loginfo("error * Kp: %f * %f = %f"%(self.error_angular, self.yawKp, p))                                    
+        rospy.loginfo("yaw_p term: %f"%yaw_p)
+        if self.angular_z > 0:
+            pid_angular_z = yaw_p # + yaw_i - yaw_d
+        else:
+            pid_angular_z = yaw_p # + yaw_i + yaw_d
+
+        if math.sqrt((self.goal_y - self.robot_y)**2 + (self.goal_x - self.robot_x)**2) > 1:
+            torque = self.angular_z + pid_angular_z
+        else:
+            torque = self.angular_z
+        
+
+        # scale to diff drive                                                                                        
+        self.left_cmd.data = -1.0 * torque + thrust                                                                          
+        self.right_cmd.data = torque + thrust                                                                                
+        
+        # publish                                                                                                            
+        self.left_pub.publish(self.left_cmd)                                                                                 
+        self.right_pub.publish(self.right_cmd)
+
+        # Debug                                                                                                      
+        self.vpubdebug_error.publish(self.error_linear)                                                                      
+        self.vpubdebug_setpoint.publish(1)
+        self.ypubdebug_error.publish(self.error_angular)
+        self.ypubdebug_setpoint.publish(1)
 
     def pid_angular(self):
         """ Angular PID """
@@ -80,20 +145,17 @@ class Cmd_Vel_PID(object):
         # self.error_yaw
         return 0.0
 
-    def dynamic_callback(self, config, level):
-        rospy.loginfo("""Reconfigure Request: \
-        {linear_kp}, {linear_ki}, {linear_kp}, \
-        {angular_kp}, {angular_ki}, {angular_kp}, \
-        {desired_velocity_x} """.format(**config))
+    def dynamic_cb(self, config, level):
+        rospy.loginfo("Reconfigure Request...")
 
-        self.linear_kp = config['linear_kp']
-        self.linear_ki = config['linear_ki']
-        self.linear_kd = config['linear_kd']
-        self.angular_kp = config['angular_kp']
-        self.angular_ki = config['angular_ki']
-        self.angular_kd = config['angular_kd']
+        self.velKp = config['velKp']
+        self.velKi = config['velKi']
+        self.velKd = config['velKd']
+        self.yawKp = config['yawKp']
+        self.yawKi = config['yawKi']
+        self.yawKd = config['yawKd']
 
-        self.desired_velocity_x = config['desired_velocity_x']
+        #self.desired_velocity_x = config['desired_velocity_x']
 
         return config
 
@@ -111,15 +173,15 @@ class Cmd_Vel_PID(object):
         _, _, self.goal_yaw = euler_from_quaternion((q.x, q.y, q.z, q.w))
 
         self.error_linear = 0.0  # reset linear error
-
         self.desired_yaw = 0.0  # reset desired yaw
         self.error_yaw = 0.0  # reset yaw error
+        self.pid()
 
     def robot_cb(self, msg):
-        rospy.loginfo(msg.pose)
-        self.robot_x = msg.pose.position.x
-        self.robot_y = msg.pose.position.y
-        q = msg.pose.orientation
+        # rospy.loginfo(msg)
+        self.robot_x = msg.pose.pose.position.x
+        self.robot_y = msg.pose.pose.position.y
+        q = msg.pose.pose.orientation
         _, _, self.robot_yaw = euler_from_quaternion((q.x, q.y, q.z, q.w))
         
 

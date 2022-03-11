@@ -45,8 +45,8 @@ class Node():
         rospy.logdebug("TX ")
         rospy.logdebug("\tleft:%f, right:%f"%(self.left_msg.data,
                                               self.right_msg.data))
-        rospy.loginfo("cmd_vel linear_x:%f, angular_z:%f"%(data.linear.x, data.angular.z))
-        rospy.loginfo("left:%f, right:%f"%(self.left_msg.data, self.right_msg.data))
+        #rospy.loginfo("cmd_vel linear_x:%f, angular_z:%f"%(data.linear.x, data.angular.z))
+        #rospy.loginfo("left:%f, right:%f"%(self.left_msg.data, self.right_msg.data))
         self.left_pub.publish(self.left_msg)
         self.right_pub.publish(self.right_msg)
 
