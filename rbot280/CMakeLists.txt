@@ -172,6 +172,7 @@ catkin_install_python(PROGRAMS
   nodes/cmd_vel_pid.py
   nodes/diff_drive_control.py
   nodes/diff_drive_control_vel.py
+  nodes/test_pid.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   )
 
