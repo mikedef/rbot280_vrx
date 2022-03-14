@@ -56,6 +56,7 @@ class Node(object):
         self.heading_control_effort.data = 0.0
         self.cmd_vel_x.data = 0.0
         self.cmd_ang_z.data = 0.0
+        self.test_hdg = 0.0
     
         self.desired_speed.data = rospy.get_param('~desired_speed', 0.0)
         self.desired_heading.data = rospy.get_param('~desired_heading', 0.0)
@@ -72,13 +73,12 @@ class Node(object):
 
     def hdg_cb(self):
         self.desired_heading = self.desired_heading
-        self.heading_state_pub.publish(0.0)
+        self.heading_plant_state.data = self.heading_control_effort.data + self.test_hdg
+        self.test_hdg += self.heading_control_effort.data
+        self.heading_state_pub.publish(self.test_hdg)
 
     def spd_cb(self):
         self.desired_speed = self.desired_speed
-        #rospy.loginfo("desired_speed: %f"%self.desired_speed.data)
-        control = self.speed_control_effort.data
-        dx = self.dx.data
         self.speed_plant_state.data = self.speed_control_effort.data + self.dx.data
         if self.speed_plant_state.data > self.desired_speed.data:
             self.speed_plant_state.data = self.desired_speed.data
