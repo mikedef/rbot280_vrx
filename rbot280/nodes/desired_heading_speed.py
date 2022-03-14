@@ -10,6 +10,7 @@ import rospy
 from math import pi
 from std_msgs.msg import Float64, Float32
 from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Twist
 from dynamic_reconfigure.server import Server
 from rbot280.cfg import DesiredHdgSpdDynamicConfig
 
@@ -31,6 +32,7 @@ class Node(object):
         rospy.Subscriber("/speed/control_effort", Float64, self.speed_control_effort_cb, queue_size=10)
         rospy.Subscriber("/heading/control_effort", Float64, self.heading_control_effort_cb, queue_size=10)
         rospy.Subscriber("/wamv/robot_localization/odometry/filtered", Odometry, self.robot_cb, queue_size=10)
+        rospy.Subscriber("/cmd_vel", Twist, self.cmd_vel_cb, queue_size=10)
 
         # Dynamic Configure
         self.srv = Server(DesiredHdgSpdDynamicConfig, self.dynamic_cb)
@@ -42,12 +44,18 @@ class Node(object):
         self.heading_plant_state = Float64()
         self.heading_control_effort = Float64()
         self.dx = Float64()
+        self.dyaw = Float64()
         self.left_cmd = Float32()
         self.right_cmd = Float32()
-        self.test_x = Float64()
-        self.test_x.data = 0.0  # var to start speed test with
+        self.cmd_vel_x = Float32()
+        self.cmd_ang_z = Float32()
+        
         self.dx.data = 0.0
+        self.dyaw.data = 0.0
         self.speed_control_effort.data = 0.0
+        self.heading_control_effort.data = 0.0
+        self.cmd_vel_x.data = 0.0
+        self.cmd_ang_z.data = 0.0
     
         self.desired_speed.data = rospy.get_param('~desired_speed', 0.0)
         self.desired_heading.data = rospy.get_param('~desired_heading', 0.0)
@@ -55,7 +63,7 @@ class Node(object):
 
         while not rospy.is_shutdown():
             self.hdg_cb()
-            self.spd_cb()
+            #self.spd_cb()
 
             self.setpoint_heading.publish(self.desired_heading)
             self.setpoint_speed.publish(self.desired_speed)
@@ -68,11 +76,12 @@ class Node(object):
 
     def spd_cb(self):
         self.desired_speed = self.desired_speed
+        #rospy.loginfo("desired_speed: %f"%self.desired_speed.data)
         control = self.speed_control_effort.data
-        #test_x = self.test_x.data
         dx = self.dx.data
-        self.speed_plant_state.data = control + dx
-        self.test_x.data = self.speed_plant_state.data  # feed back into test state to follow tracking. 
+        self.speed_plant_state.data = self.speed_control_effort.data + self.dx.data
+        if self.speed_plant_state.data > self.desired_speed.data:
+            self.speed_plant_state.data = self.desired_speed.data
         self.speed_state_pub.publish(self.speed_plant_state.data)
 
         torque = 0.0  # dummy torque for scaling 
@@ -88,9 +97,17 @@ class Node(object):
 
     def robot_cb(self, msg):
         self.dx.data = msg.twist.twist.linear.x
+        self.dyaw.data = msg.twist.twist.angular.z
         
     def heading_control_effort_cb(self, msg):
         self.heading_control_effort.data = msg.data
+
+    def cmd_vel_cb(self, msg):
+        self.cmd_vel_x.data = msg.linear.x
+        self.cmd_ang_z.data = msg.angular.z
+        # If being commanded to drive Do PID loop
+        self.spd_cb()
+        
 
     def dynamic_cb(self, config, level):
         rospy.loginfo("Reconfigure Request...")
