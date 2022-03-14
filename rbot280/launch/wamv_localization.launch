@@ -15,7 +15,7 @@
     <param name="base_link_frame" value="wamv/base_link"/>
     <param name="world_frame" value="wamv/odom"/>
     <param name="publish_tf" value="true"/>
-    <param name="frequency" value="20"/>
+    <param name="frequency" value="10"/>
     <param name="reset_on_time_jump" value="true" />  <!-- For looping bagfiles -->
     <param name="predict_to_current_time" value="true" />
     <param name="imu0_queue_size" value="100" />

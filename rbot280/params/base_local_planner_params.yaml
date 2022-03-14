@@ -5,8 +5,8 @@ clearing_rotation_allowed: false
 TrajectoryPlannerROS:
 
 # Robot Configuration Parameters
-  max_vel_x: 2.5  # 5km/h=1.3m/s, The maximum forward velocity allowed for the base in m/s 
-  min_vel_x: 0.1  # The minimum forward velocity allowed for the base in m/s. Must be set a min to overcome friction
+  max_vel_x: 5.0  # 5km/h=1.3m/s, The maximum forward velocity allowed for the base in m/s 
+  min_vel_x: 0.25  # The minimum forward velocity allowed for the base in m/s. Must be set a min to overcome friction
   max_vel_y: 0.0  # 0 for differentail drive robot
   min_vel_y: 0.0
   max_vel_theta: 1.0  # Maximum rotational velocity allowed for the base in rad/s
@@ -21,7 +21,7 @@ TrajectoryPlannerROS:
   holonomic_robot: false
 
 # Goal Tolerance Parameters
-  xy_goal_tolerance: 0.50  # 50cm, tolerance in meters for the controller in the x & y distance when achieving a goal
+  xy_goal_tolerance: 2.0  # 50cm, tolerance in meters for the controller in the x & y distance when achieving a goal
   yaw_goal_tolerance: 0.4  # ~24 degrees, tolerance in rads for the controller in yaw/rotation when achieving its goal
 
 # Forward Simulation Parameters
@@ -29,5 +29,5 @@ TrajectoryPlannerROS:
   vx_samples: 8  # number of samples to use when exploring the x velocity space
   vy_samples: 0  # diff robot
   vtheta_samples: 20  # number of samples to use when exploring the theta velocity space
-  sim_granularity: 0.05  # step size, in meters, to take between points on a given trajectory
+  sim_granularity: 0.5  # step size, in meters, to take between points on a given trajectory
   dwa: true

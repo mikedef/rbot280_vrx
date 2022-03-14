@@ -99,6 +99,7 @@ catkin_python_setup()
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
  generate_dynamic_reconfigure_options(
    config/CmdVelPID.cfg
+   config/DesiredHdgSpd.cfg
 #   cfg/DynReconf2.cfg
  )
 
@@ -172,7 +173,9 @@ catkin_install_python(PROGRAMS
   nodes/cmd_vel_pid.py
   nodes/diff_drive_control.py
   nodes/diff_drive_control_vel.py
+  nodes/diff_drive_control_yaw.py
   nodes/test_pid.py
+  nodes/desired_heading_speed.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   )
 

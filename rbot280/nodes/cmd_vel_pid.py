@@ -70,7 +70,9 @@ class Cmd_Vel_PID(object):
         # linear
         self.error_linear = 0.0
         # setpoint desired_velocity
-
+        self.desired_velocity = 1.0
+        self.robot_dyaw = 0.0
+        self.robot_dx = 0.0
         # angular
         self.error_yaw = 0.0
         self.desired_yaw = 0.0  # Setpoint
@@ -112,6 +114,7 @@ class Cmd_Vel_PID(object):
         # map to -pi to pi
         self.error_angular = math.atan2(math.sin(angle_error), math.cos(angle_error))
         yaw_p = self.yawKp * self.error_angular
+        rospy.loginfo("robot dyaw: %f"%self.robot_dyaw)
         rospy.loginfo("error * Kp: %f * %f = %f"%(self.error_angular, self.yawKp, p))                                    
         rospy.loginfo("yaw_p term: %f"%yaw_p)
         if self.angular_z > 0:
@@ -181,6 +184,8 @@ class Cmd_Vel_PID(object):
         # rospy.loginfo(msg)
         self.robot_x = msg.pose.pose.position.x
         self.robot_y = msg.pose.pose.position.y
+        self.robot_dyaw = msg.twist.twist.angular.z
+        self.robot_dx = msg.twist.twist.linear.x
         q = msg.pose.pose.orientation
         _, _, self.robot_yaw = euler_from_quaternion((q.x, q.y, q.z, q.w))
         

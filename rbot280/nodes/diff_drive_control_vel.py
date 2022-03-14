@@ -32,67 +32,31 @@ class Node(object):
 
         # init
         self.lasttime = None
-        self.lastx = None
-        self.error = 0.0
-        self.previous_error = 0.0
-        self.integral = 0.0
-        self.derivative = 0.0
+        self.dx = None
 
     def twist_cb(self, msg):
-        #rospy.loginfo(msg.linear.x)
-        vel = float(msg.linear.x)
-        ang = float(msg.angular.z)
-        #rospy.loginfo("v_setpoint: %f, y_setpoint: %f"%(vel, ang))
-        #self.ypid.set_setpoint(ang)
-        self.vpid.set_setpoint(vel)
-        
+        rospy.loginfo("velx: %.7f"%float(msg.linear.x))
+        vel = msg.linear.x
+        self.vpid.set_setpoint(msg.linear.x)
+        #self.vpid.set_setpoint(1.0)
 
-    def odom_cb(self, msg):
-        # yaw control
-        
         now = rospy.get_time()
         if self.lasttime is None:
             self.lasttime = now
             return
         dt = now - self.lasttime
         self.lasttime = now
-        rospy.loginfo("dt: %f"%dt)
         if dt < 1.0e-6:
             rospy.logwarn("USV Control dt too small <%f>"%dt)
             return
         
         torque = 0
 
-        #if self.lastx is None:
-        #    #self.lastx = msg.pose.position.x
-        #    return
-        #x = msg
-
-        
-        # velocity control
-        dx = msg.twist.twist.linear.x
-        rospy.loginfo("odom x: %f"%dx)
-        self.error = 1.0 - dx  #self.error  
-        self.integral = self.integral + (self.error * dt)
-        self.derivative = (self.error - self.previous_error) / dt
-        rospy.loginfo("error: %f"%self.error)
-        rospy.loginfo("error*dt %f"%(self.error*dt))
-        rospy.loginfo("integral: %f"%self.integral)
-        div_error = self.error-self.previous_error
-        rospy.loginfo("error - prev error: %f"%div_error)
-        rospy.loginfo("derivative: %f"%self.derivative)
-        rospy.loginfo("dx-setpoint: %f"%self.error)
-        pid = (10.1 * self.error) + (1.0 * self.integral) + (0.0 * self.derivative)
-        rospy.loginfo("PID out: %f"%pid)
-
-        
-        vout = self.vpid.execute(dt, dx)
+        rospy.loginfo("dx: %f"%self.dx)
+        vout = self.vpid.execute(dt, self.dx)
         thrust = vout[0]
-        #thrust = pid
-        rospy.loginfo("vpid error: %f"%vout[4])
-        rospy.loginfo("vpid derivative: %f"%vout[6])
-        rospy.loginfo("vpid intergral: %f"%vout[7])
-        self.previous_error = self.error
+        
+        
         # scale to diff drive
         self.left_cmd.data = -1.0 * torque + thrust
         self.right_cmd.data = torque + thrust
@@ -102,9 +66,28 @@ class Node(object):
         self.right_pub.publish(self.right_cmd)
 
         # Debug
-        #self.vpubdebug_error.publish(vout[4])
-        self.vpubdebug_error.publish(self.error)
+        self.vpubdebug_error.publish(vout[4])
         self.vpubdebug_setpoint.publish(vout[5])
+        
+
+    def odom_cb(self, msg):
+                
+        
+        #if self.lastx is None:
+        #    #self.lastx = msg.pose.position.x
+        #    return
+        #x = msg
+
+        
+        # velocity control
+        dx = msg.twist.twist.linear.x
+        self.dx = dx
+        #rospy.loginfo("dx: %.7f"%dx)
+        if dx < 0.01:
+            dx = 0.0
+        #rospy.loginfo("dx: %.7f"%dx)
+
+        
         
         
     def dynamic_cb(self, config, level):
@@ -130,11 +113,8 @@ if __name__ == '__main__':
     velKi = rospy.get_param('~velKi', 0.0)
     velKd = rospy.get_param('~velKd', 0.0)
 
-    
-
     # Init Cmd_Vel_PID object - creats a PID object
     node = Node()
-
 
     # Setup gains from params
     node.vpid.Kp = velKp
