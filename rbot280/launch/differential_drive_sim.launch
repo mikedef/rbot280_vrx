@@ -24,7 +24,9 @@
     </node>
 
     <node pkg="rbot280" type="desired_heading_speed.py"
-	  name="desired_heading_speed" output="screen" />
+	  name="desired_heading_speed" output="screen" >
+      <param name="desired_speed" value="0.5" />
+    </node>
 
     <!-- rqt_plot is a resource hog, so if you're seeing high CPU usage, don't launch it  -->
     <node name="rqt_plot" pkg="rqt_plot" type="rqt_plot"

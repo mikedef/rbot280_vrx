@@ -63,34 +63,83 @@ class Node(object):
         rospy.loginfo(self.desired_speed)
 
         while not rospy.is_shutdown():
-            self.hdg_cb()
+            #self.hdg_cb()
             #self.spd_cb()
 
             self.setpoint_heading.publish(self.desired_heading)
             self.setpoint_speed.publish(self.desired_speed)
 
+
+            self.desired_heading = self.cmd_ang_z.data
+            self.heading_plant_state.data = self.heading_control_effort.data 
+            self.heading_state_pub.publish(self.heading_plant_state.data)
+            
+            # thrust control
+            self.desired_speed = self.desired_speed # - self.dx.data
+            self.speed_plant_state.data = self.speed_control_effort.data # + self.dx.data
+            #rospy.loginfo("speed plant: %f"%self.speed_plant_state.data)
+            if self.speed_plant_state.data > self.desired_speed.data:
+                self.speed_plant_state.data = self.desired_speed.data
+            self.speed_state_pub.publish(self.speed_plant_state.data)
+
+            self.left_cmd.data = -1.0 * self.heading_plant_state.data + self.speed_plant_state.data
+            self.right_cmd.data = self.heading_plant_state.data + self.speed_plant_state.data
+            self.left_pub.publish(self.left_cmd)
+            self.right_pub.publish(self.right_cmd)
+            
             r.sleep()
 
-    def hdg_cb(self):
-        self.desired_heading = self.desired_heading
-        self.heading_plant_state.data = self.heading_control_effort.data + self.test_hdg
-        self.test_hdg += self.heading_control_effort.data
-        self.heading_state_pub.publish(self.test_hdg)
+    def twist_cb(self):
+        # torque control
+        self.desired_heading = self.cmd_ang_z.data
+        self.heading_plant_state.data = self.heading_control_effort.data 
+        self.heading_state_pub.publish(self.heading_plant_state.data)
 
-    def spd_cb(self):
-        self.desired_speed = self.desired_speed
-        self.speed_plant_state.data = self.speed_control_effort.data + self.dx.data
+        # thrust control
+        self.desired_speed = self.desired_speed  # - self.dx.data
+        self.speed_plant_state.data = self.speed_control_effort.data # + self.dx.data
+        #rospy.loginfo("speed plant: %f"%self.speed_plant_state.data)
         if self.speed_plant_state.data > self.desired_speed.data:
             self.speed_plant_state.data = self.desired_speed.data
         self.speed_state_pub.publish(self.speed_plant_state.data)
 
-        torque = 0.0  # dummy torque for scaling 
-        # scale to diff drive
-        self.left_cmd.data = -1.0 * torque + self.speed_plant_state.data
-        self.right_cmd.data = torque + self.speed_plant_state.data
-        
+        self.left_cmd.data = -1.0 * self.heading_plant_state.data + self.speed_plant_state.data
+        self.right_cmd.data = self.heading_plant_state.data + self.speed_plant_state.data
         self.left_pub.publish(self.left_cmd)
         self.right_pub.publish(self.right_cmd)
+
+
+
+    def hdg_cb(self):
+        self.desired_heading = self.cmd_ang_z.data
+        #self.heading_plant_state.data = self.heading_control_effort.data + self.test_hdg
+        self.heading_plant_state.data = self.heading_control_effort.data + self.dyaw.data
+        #self.test_hdg += self.heading_control_effort.data
+        #self.heading_state_pub.publish(self.test_hdg)
+        self.heading_state_pub.publish(self.heading_plant_state.data)
+        #rospy.loginfo("heading output: %f"%self.dyaw.data)
+
+        # scale to diff drive. *** not actual scale just for testing
+        #self.left_cmd.data = -1.0 * self.test_hdg
+        #self.right_cmd.data = self.test_hdg
+        
+    def spd_cb(self):
+        self.desired_speed = self.desired_speed
+        self.speed_plant_state.data = self.speed_control_effort.data + self.dx.data
+        rospy.loginfo("speed plant: %f"%self.speed_plant_state.data)
+        if self.speed_plant_state.data > self.desired_speed.data:
+            self.speed_plant_state.data = self.desired_speed.data
+        else:
+            self.speed_plant_state.data *= 10
+        self.speed_state_pub.publish(self.speed_plant_state.data)
+
+        #torque = 0.0  # dummy torque for scaling 
+        # scale to diff drive
+        #self.left_cmd.data = -1.0 * torque + self.speed_plant_state.data
+        #self.right_cmd.data = torque + self.speed_plant_state.data
+        
+        #self.left_pub.publish(self.left_cmd)
+        #self.right_pub.publish(self.right_cmd)
 
     def speed_control_effort_cb(self, msg):
         self.speed_control_effort.data = msg.data
@@ -107,7 +156,8 @@ class Node(object):
         self.cmd_ang_z.data = msg.angular.z
         # If being commanded to drive Do PID loop
         self.spd_cb()
-        
+        self.hdg_cb()
+        #self.twist_cb()
 
     def dynamic_cb(self, config, level):
         rospy.loginfo("Reconfigure Request...")
