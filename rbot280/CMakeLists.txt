@@ -176,6 +176,7 @@ catkin_install_python(PROGRAMS
   nodes/diff_drive_control_yaw.py
   nodes/test_pid.py
   nodes/desired_heading_speed.py
+  nodes/simple_controller.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   )
 
