@@ -20,6 +20,7 @@ class Node(object):
         self.goal_theta = 0.0
         self.angle_to_wpt = 0.0
         self.robot = Point()
+        self.robot_twist = Twist()
         self.torque = 0.0
         self.thrust = 0.0
 
@@ -34,8 +35,8 @@ class Node(object):
         self.goal.x = msg.poses[-1].pose.position.x
         self.goal.y = msg.poses[-1].pose.position.y
         rospy.loginfo("Goal Point: X:%f, Y:%f"%(self.goal.x, self.goal.y))
-        rospy.loginfo("Current Point: X:%f, Y:%f"%(self.robot.x, self.robot.y))
-
+        #rospy.loginfo("Current Point: X:%f, Y:%f"%(self.robot.x, self.robot.y))
+        
         # Drive to goal wpt
         self.control()
         
@@ -47,7 +48,8 @@ class Node(object):
         q = msg.pose.pose.orientation
         (roll, pitch, self.robot.z) = euler_from_quaternion([q.x, q.y, q.z, q.w])
         #rospy.loginfo("robot x,y,theta: %f, %f, %f"%(self.robot.x, self.robot.y, self.robot.z))
-
+        self.robot_twist = msg.twist.twist
+        #self.control()
         
 
     def control(self):
@@ -55,13 +57,18 @@ class Node(object):
         x = self.goal.x - self.robot.x
         y = self.goal.y - self.robot.y
         theta = math.atan2(y,x)
-
+        #rospy.loginfo('goal theta: %f'%theta)
         # Angular PID
+        PV = self.robot.z  # Process Variable?
+        #rospy.loginfo("Robot Pose: %f"%PV)
+        #theta = self.testTheta
+        SP = theta  # Set Point?
         error_angle = theta - self.robot.z
-        # map to -pi to pi
-        error_angle = math.atan2(math.sin(error_angle), math.cos(error_angle))
+        #rospy.loginfo("KP: %f, KI: %f, KD: %f"%(self.yawKp, self.yawKi, self.yawKd))
+        # map to -pi(-3.14) to pi(3.14)
+        error_angle = math.atan2(math.sin(error_angle), math.cos(error_angle)) # Error Term
         yawP = self.yawKp * error_angle
-        rospy.loginfo("Error Angular: %f, yawP: %f"%(error_angle, yawP))
+        #rospy.loginfo("Error Angular: %f, yawP: %f"%(error_angle, yawP))
         derivative_error = error_angle - self.derivator_yaw
         yawD = self.yawKd * math.fabs(math.atan2(math.sin(derivative_error),
                                                  math.cos(derivative_error)))
@@ -77,21 +84,27 @@ class Node(object):
         # Find distance difference (if less than 2.5m linear.x thrust)
         error_linear = math.sqrt((self.goal.y - self.robot.y)**2 + (self.goal.x - self.robot.x)**2)
 
-        if abs(error_angle) > 0.25:
-            self.torque = yawP + yawD  + yawI  # yawP + yawI + yawD
+        rospy.loginfo('p: %f, i: %f, d: %f'%(yawP, yawI, yawD))
+        if abs(error_angle) > 0.05:
+            self.torque = yawP + yawD + yawI  # TURNED OFFF
+            if self.torque > self.maxTorque and error_angle > 0.0:
+                self.torque = self.maxTorque
+            elif self.torque < -self.maxTorque and error_angle < 0.0:
+                rospy.loginfo('here')
+                self.torque = -1.0 * self.maxTorque
         else:
             self.torque = 0.0
+        rospy.loginfo('torque: %f'%self.torque)
 
         # Linear PID
-        #lin_kp = 1.0
         self.velKp
+        velPV = self.robot_twist.linear.x
         velP = self.velKp * error_linear
         thrust = velP # + velI + velD
-        #max_speed = 0.4
         if thrust > self.maxSpeed:
             thrust = self.maxSpeed
 
-        rospy.loginfo("linear error: %f"%error_linear)
+        #rospy.loginfo("linear error: %f"%error_linear)
             
         if error_linear > 3.5:
             self.thrust = thrust
@@ -105,8 +118,11 @@ class Node(object):
             self.derivator_yaw = 0.0
             self.integrator_yaw = 0.0
             error_angular = 0.0
-
-        # scale to diff drive 
+            
+        rospy.loginfo("thrust: %f"%self.thrust)
+        # scale to diff drive
+        total = self.torque + self.thrust
+        rospy.loginfo("total torque+thrust: %f"%total)
         self.left_cmd.data = -1.0 * self.torque + self.thrust
         self.right_cmd.data = self.torque + self.thrust
         rospy.loginfo("Thrust Left: %f, Thrust Right: %f"%(self.left_cmd.data, self.right_cmd.data))
@@ -116,30 +132,35 @@ class Node(object):
         self.right_pub.publish(self.right_cmd)
 
         # debug
-        self.ypubdebug_error.publish(error_angle)
-        self.ypubdebug_setpoint.publish(0.0)
-        self.vpubdebug_error.publish(error_linear)
-        self.vpubdebug_setpoint.publish(0.0)
+        self.ypubdebug_error.publish(PV)
+        self.ypubdebug_setpoint.publish(SP)
+        self.vpubdebug_error.publish(velPV)
+        self.vpubdebug_setpoint.publish(self.maxSpeed)
 
     def dynamic_cb(self, config, level):
         rospy.loginfo("Reconfigure request....")
         self.velKp = config['velKp']
+        self.velKd = config['velKd']
         Ki = config['velKi']
+        self.velKi = config['velKi']
         # zero integrator
         tol = 1e-6
         if abs(abs(Ki) - abs(self.velKi)) > tol:
             rospy.loginfo('setting vel Ki to %.3f'%Ki)
             self.velKi = Ki
-        self.velKd = config['velKd']
-
+        
+        self.yawKp = config['yawKp']
+        self.yawKd = config['yawKd']
         self.yawKi = config['yawKi']
         Ki = config['yawKi']
         if abs(abs(Ki) - abs(self.yawKi)) > tol:
             rospy.loginfo('setting yaw Ki to %.3f'%Ki)
             self.yawKi = Ki
-        self.velKd = config['velKd']
+        
 
         self.maxSpeed = config['maxSpeed']
+        self.maxTorque = config['maxTorque']
+        self.testTheta = config['testTheta']
 
         return config
 
@@ -157,6 +178,8 @@ if __name__ == '__main__':
     yawKi = rospy.get_param('~yawKi', 0.0)
     yawKd = rospy.get_param('~yawKd', 0.0)
     maxSpeed = rospy.get_param('~maxSpeed', 0.0)
+    maxTorque = rospy.get_param('~maxTorque', 0.0)
+    testTheta = rospy.get_param('~testTheta', 0.0)
 
     # ingest params
     node.velKp = velKp
@@ -166,6 +189,8 @@ if __name__ == '__main__':
     node.yawKi = yawKi
     node.yawKd = yawKd
     node.maxSpeed = maxSpeed
+    node.maxTorque = maxTorque
+    node.testTheta = testTheta
 
     # Msg out for left and right thrusters
     node.left_cmd = Float32()
