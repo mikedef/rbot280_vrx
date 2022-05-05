@@ -1,49 +1,82 @@
 
 <launch>
+  <!-- launch lidar clustering for the cameras fov
+  <group ns="lidar_clustering_center_camera_fov">                                 
+    <include                                                                                            
+        file="$(find pointcloud_cluster_detect)/launch/pointcloud_cluster_detect.launch">        
+      <arg name="pc_topic" value="/wamv/sensors/lidars/lidar_wamv/points"/>         
+      <arg name="filter_camera_view" value="false"/>                                           
+      <arg name="camera_hfov" value="80" />                                        
+      <arg name="camera_theta" value="0.0" />                                       
+      <arg name="filter_cloud" value="true"/>                                               
+      <arg name="remove_points" value="1.0"/>                                        
+      <arg name="downsampled_cloud" value="true"/>                                              
+      <arg name="leaf_size" value="0.1"/>                                                     
+      <arg name="clustering_distance" value="0.05"/>                                   
+      <arg name="cluster_size_min" value="4"/>                                              
+      <arg name="cluster_size_max" value="60"/>                                             
+      <arg name="cluster_seg_thresh" value="1.0"/>                                           
+      <arg name="drop_cluster_count" value="10"/>                                
+      <arg name="viz" value="true"/>       
+    </include>                                  
+  </group>
+  -->                           
 
-  <!-- launch lidar clustering for the cameras fov-->                                                                                    
-  <group ns="lidar_clustering_center_camera_fov">                                                                                          
-    <include                                                                                                                               
-        file="$(find pointcloud_cluster_detect)/launch/pointcloud_cluster_detect.launch">                                                  
-      <arg name="pc_topic" value="/wamv/sensors/lidars/lidar_wamv/points"/>                                                                
-      <arg name="filter_camera_view" value="false"/>                                                                                       
-      <arg name="camera_hfov" value="80" />                                                                                                
-      <arg name="camera_theta" value="0.0" />                                                                                              
-      <arg name="filter_cloud" value="true"/>                                                                                              
-      <arg name="remove_points" value="1.0"/>                                                                                              
-      <arg name="downsampled_cloud" value="true"/>                                                                                         
-      <arg name="leaf_size" value="0.1"/>                                                                                                 
-      <arg name="clustering_distance" value="0.05"/>                                                                                       
-      <arg name="cluster_size_min" value="4"/>                                                                                             
-      <arg name="cluster_size_max" value="60"/>                                                                                            
-      <arg name="cluster_seg_thresh" value="1.0"/>                                                                                         
-      <arg name="drop_cluster_count" value="10"/>                                                                                          
-      <arg name="viz" value="true"/>                                                                                                       
-    </include>                                                                                                                             
-  </group>                                                                                                                                 
-
-  
-  <!--                                                                                                                             
-       Node to perform object detection, see darknet_node.py                                                                        
-  -->                                                                                                                              
-  <node name="classification" pkg="rbot280_detect" type="darknet_node.py" required="true" output="screen">                        
-    
-    <remap from="~0/input" to="/wamv/sensors/cameras/front_center_camera/image_raw" />
+  <arg name="tom" default='false' />
+  <arg name="mike" default='true'/>
+  <!--                                                                                        
+       Node to perform object detection, see darknet_node.py                                          
+  -->                                                                                                    
+  <node name="classification" pkg="rbot280_detect" type="darknet_node.py"
+	required="true" output="screen" if="$(arg tom)">                           
+    <remap from="~0/input"
+	   to="/wamv/sensors/cameras/front_center_camera/image_raw" />
     <!--
-	<remap from="~1/input" to="$(arg camera1_image_topic)" />                                                                    
-	<remap from="~2/input" to="$(arg camera2_image_topic)" />                                                                    
+	<remap from="~1/input" to="$(arg camera1_image_topic)" />                                            
+	<remap from="~2/input" to="$(arg camera2_image_topic)" />                     
     -->
-    
-    <rosparam>                                                                                                                   
-      n_inputs: 1                                                                                                              
-      classes: [boat]                                                                                                          
-      darknet_config_file: "/home/mikedef/data/yolo/yolov4.cfg"                                                                    
-      darknet_weights_file: "/home/mikedef/data/yolo/yolov4.weights"                                                               
-      darknet_meta_file: "/home/mikedef/data/yolo/coco_model.data"                                                                     
-      darknet_thresh: 0.4                                                                                                      
-      darknet_hier_thresh: 0.4                                                                                                 
-      darknet_nms: 0.35                                                                                                        
-    </rosparam>                                                                                                                  
-  </node>  
+    <rosparam>                                                                                   
+      n_inputs: 1                                                                            
+      
+      classes: [boat]
+      <!--
+      darknet_config_file: "/home/mikedef/data/yolo/yolov4.cfg"             
+      darknet_weights_file: "/home/mikedef/data/yolo/yolov4.weights"                              
+      darknet_meta_file: "/home/mikedef/data/yolo/coco_model.data" -->
+      darknet_config_file: "/home/mikedef/data/yolo/darknet/cfg/yolov3.cfg"             
+      darknet_weights_file: "/home/mikedef/data/yolo/yolov3.weights"                              
+      darknet_meta_file: "/home/mikedef/data/yolo/coco_model.data"                                         
+      darknet_thresh: 0.4                                                                  
+      darknet_hier_thresh: 0.4             
+      darknet_nms: 0.35
+      use_sim_time: "true"  <!-- needed for gazebo? -->
+    </rosparam>                                                                                         
+  </node>
 
+  <node name="classification" pkg="rbot280_detect" type="darknet_node2.py"
+	required="true" output="screen" if="$(arg mike)">                           
+    <remap from="~0/input"
+	   to="/wamv/sensors/cameras/front_center_camera/image_raw" />
+    <!--
+	<remap from="~1/input" to="$(arg camera1_image_topic)" />                                            
+	<remap from="~2/input" to="$(arg camera2_image_topic)" />                     
+    -->
+    <rosparam>                                                                                   
+      n_inputs: 1                                                                            
+      
+      classes: [boat]
+      <!--
+      darknet_config_file: "/home/mikedef/data/yolo/yolov4.cfg"             
+      darknet_weights_file: "/home/mikedef/data/yolo/yolov4.weights"                              
+      darknet_meta_file: "/home/mikedef/data/yolo/coco_model.data" -->
+      darknet_config_file: "/home/mikedef/data/yolo/darknet/cfg/yolov3.cfg"             
+      darknet_weights_file: "/home/mikedef/data/yolo/yolov3.weights"                              
+      darknet_meta_file: "/home/mikedef/data/yolo/coco_model.data"                                         
+      darknet_thresh: 0.4                                                                  
+      darknet_hier_thresh: 0.4             
+      darknet_nms: 0.35
+      use_sim_time: "true"  <!-- needed for gazebo? -->
+    </rosparam>                                                                                         
+  </node>p
+  
 </launch>

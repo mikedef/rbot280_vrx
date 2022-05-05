@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2020 University of Massachusetts
-All rights reserved.
-This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.
-Authors:  Tom Clunie <clunietp@gmail.com>
+
 """
 
 from threading import Lock
 import rospy
 import numpy as np
 import cv2
-from darknet import (
+from darknet2 import (
     detect_image as darknet_detect,
     lib as darknet_lib, 
     load_net as darknet_load_net, 
     load_meta as darknet_load_meta,
-    array_to_image as darknet_array_to_image
+    #array_to_image as darknet_array_to_image
 )
 from sensor_msgs.msg import Image, CompressedImage
 from rbot_msgs.msg import Classification, ClassificationArray
@@ -105,7 +102,7 @@ class darknet_node(object):
         
     def detect(self, image_msg):
         """ perform object detection in image message, return ClassificationArray, OpenCV Image """
-
+        
         # darknet requires rgb image in proper shape.  we need to resize, and then convert resulting bounding boxes to proper shape
         img = utils.convert_ros_msg_to_cv2( image_msg, 'rgb8' )
 
@@ -119,12 +116,13 @@ class darknet_node(object):
 
         # convert to darknet img format
         #  todo:  use darknet/opencv instead?
-        img_data = darknet_array_to_image( img )  #returns tuple
+        #img_data = darknet_array_to_image( img )  #returns tuple
 
         # returns [(nameTag, dets[j].prob[i], (b.x, b.y, b.w, b.h))]:
         dets = []
         with self.lock:  # darknet apparently not thread-safe, https://github.com/pjreddie/darknet/issues/655
-            dets = darknet_detect( self.net, self.meta, img_data[0], thresh=self.darknet_thresh, hier_thresh=self.darknet_hier_thresh, nms=self.darknet_nms )
+            #dets = darknet_detect( self.net, self.meta, img_data[0], thresh=self.darknet_thresh, hier_thresh=self.darknet_hier_thresh, nms=self.darknet_nms )
+            dets = darknet_detect( self.net, self.meta, img, thresh=self.darknet_thresh, hier_thresh=self.darknet_hier_thresh, nms=self.darknet_nms )
             #rospy.loginfo(dets[0][0])
         # if list of classes is specified, perform filtering on detected classes
         
