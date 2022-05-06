@@ -7,13 +7,8 @@ from threading import Lock
 import rospy
 import numpy as np
 import cv2
-from darknet2 import (
-    detect_image as darknet_detect,
-    lib as darknet_lib, 
-    load_net as darknet_load_net, 
-    load_meta as darknet_load_meta,
-    #array_to_image as darknet_array_to_image
-)
+import darknet
+
 from sensor_msgs.msg import Image, CompressedImage
 from rbot_msgs.msg import Classification, ClassificationArray
 from rbot_msgs import utils
@@ -60,12 +55,12 @@ class darknet_node(object):
         self.darknet_hier_thresh = rospy.get_param("~darknet_hier_thresh", 0.5 )
         self.darknet_nms = rospy.get_param("~darknet_nms", 0.45 )
 
-        self.net = darknet_load_net(str(configPath).encode("ascii"), str(weightPath).encode("ascii"), 0)
-        self.meta = darknet_load_meta( str(metaPath).encode("ascii") )
+        self.net = darknet.load_net(str(configPath).encode("ascii"), str(weightPath).encode("ascii"), 0)
+        self.meta = darknet.load_meta( str(metaPath).encode("ascii") )
 
         # get network expected image shape params
-        self.net_img_w = darknet_lib.network_width( self.net )
-        self.net_img_h = darknet_lib.network_height( self.net )
+        self.net_img_w = darknet.lib.network_width( self.net )
+        self.net_img_h = darknet.lib.network_height( self.net )
 
         # publishers array of classification array
         self.pubs = [ rospy.Publisher( '~%d/output' % i, ClassificationArray, queue_size=1 ) for i in range(self.n_inputs) ]
