@@ -77,6 +77,6 @@
       darknet_nms: 0.35
       use_sim_time: "true"  <!-- needed for gazebo? -->
     </rosparam>                                                                                         
-  </node>p
+  </node>
   
 </launch>

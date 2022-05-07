@@ -4,17 +4,15 @@
                                                                                                                                 
   <arg name="bag_file" default="/home/mikedef/data/obstacle-buoys.bag" />                
   <arg name="start" default="0" />                       
-  <node pkg="rosbag" name="play" type="play" output="screen" args="--clock                               
-                                                                   -l                                                        
-                                                                   -s $(arg start)        
-                                                                   $(arg bag_file)" />                   
+  <node pkg="rosbag" name="play" type="play"
+	args="--clock -l -s $(arg start) $(arg bag_file)" />                   
 
   <arg name="rviz_config" default="$(find rbot280)/rviz/wamv_.rviz" />                                 
   <node pkg="rviz" type="rviz"                                                                           
         name="wamv_visualization" args="-d $(arg rviz_config)" />
 
   <!-- launch lidar clustering for the cameras fov-->                                                                    
-  <!-- -->                                                                                             
+  <!-- 
   <group ns="lidar_clustering_center_camera_fov">                                                                
     <include                                                                                                
         file="$(find pointcloud_cluster_detect)/launch/pointcloud_cluster_detect.launch">                 
@@ -34,29 +32,35 @@
       <arg name="viz" value="true"/>                                                                                 
     </include>                                                                               
   </group>
+  -->
 
-  <group ns="ml_detect_center_camera" >
-    <include file="$(find vision_ml_detect)/launch/vision_ml_detect.launch">
-      <arg name="image_src" value="/wamv/sensors/cameras/front_center_camera/image_raw" />
-      <arg name="image_transport" value="raw"/>
-      <arg name="model_path" value="/home/mikedef/data/yolo/yolov3.weights"/> 
-      <arg name="config_path" value="/home/mikedef/data/yolo/darknet/cfg/yolov3.cfg"/> 
-      <!--<arg name="model_path" value="/home/mikedef/data/yolo/yolov3-tiny.weights"/> -->
-      <!--<arg name="config_path" value="/home/mikedef/data/yolo/darknet/cfg/yolov3-tiny.cfg"/> -->
-      <arg name="framework" value=""/>
-      <arg name="classes_path" value="/home/mikedef/data/yolo/darknet/data/coco.names"/>
-      <arg name="backend" value="0" /> <!-- Cuda '5' OpenCV does not compile with cuda enabled with ROS! --> 
-      <arg name="target" value="0"/> <!-- Cuda '6' -->
-      <arg name="conf_thr" value="0.2" />
-      <arg name="nms" value="0.45" />
-      <arg name="scale" value="0.0039"/>
-      <arg name="in_width" value="416" />
-      <arg name="in_height" value="416" />
-      <arg name="swap_RB" value="false" />
-    </include>
-  </group>
-
-
+  
+  <arg name='darknet_py' default='true' />
+  <node name="rbot_280_classification" pkg="rbot280_detect" type="darknet_node2.py"                                       
+        required="true" output="screen" if="$(arg darknet_py)">                                                                 
+    <remap from="~0/input"                                                                                                  
+           to="/wamv/sensors/cameras/front_center_camera/image_raw" />                                                     
+    <!--                                                                                                                   
+        <remap from="~1/input" to="$(arg camera1_image_topic)" />                                                              
+        <remap from="~2/input" to="$(arg camera2_image_topic)" />                                                             
+    -->                                                                                                                             
+    <rosparam>                                                                                                                  
+      n_inputs: 1                                                                                                       
+                                                                                                                       
+      classes: [boat]                                                                                                                
+      <!--                                                                                                                      
+      darknet_config_file: "/home/mikedef/data/yolo/yolov4.cfg"                                                                  
+      darknet_weights_file: "/home/mikedef/data/yolo/yolov4.weights"                                                             
+      darknet_data_file: "/home/mikedef/data/yolo/coco_model.data" -->                                                         
+      darknet_config_file: "/home/mikedef/data/yolo/darknet/cfg/yolov3.cfg"                                                               
+      darknet_weights_file: "/home/mikedef/data/yolo/yolov3.weights"                                                            
+      darknet_data_file: "/home/mikedef/data/yolo/coco_model.data"                                                                   
+      darknet_thresh: 0.4                                                                                                   
+      darknet_hier_thresh: 0.4                                                                                                
+      darknet_nms: 0.35                                                                                                        
+      use_sim_time: "true"  <!-- needed for gazebo? -->                                                                    
+    </rosparam>                                                                                                              
+  </node>
   
   <!-- launch rviz, static joint transforms, revolute joint static transforms 
   <include file="$(find wamv_gazebo)/launch/rviz_vrx.launch" />  -->                                                          

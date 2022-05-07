@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /TF1/Frames1
+        - /Image1
       Splitter Ratio: 0.7235022783279419
     Tree Height: 411
   - Class: rviz/Selection
@@ -21,7 +22,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: front-right-camera
+    SyncSource: front-center-camera
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -290,12 +291,12 @@ Visualization Manager:
       Marker Topic: /wamv/sensors/lidars/lidar_wamv/points/text_markers
       Name: MarkerArray
       Namespaces:
-        text_clustering: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /wamv/sensors/cameras/front_center_camera/image_raw/vision_ml_detect
+      Image Topic: /rbot_280_classification/0/image
       Max Value: 1
       Median window: 5
       Min Value: 0

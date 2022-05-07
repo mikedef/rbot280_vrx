@@ -8,6 +8,7 @@ import rospy
 import numpy as np
 import cv2
 import darknet
+from cv_bridge import CvBridge, CvBridgeError
 
 from sensor_msgs.msg import Image, CompressedImage
 from rbot_msgs.msg import Classification, ClassificationArray
@@ -48,19 +49,30 @@ class darknet_node(object):
         # init darknet
         configPath = rospy.get_param("~darknet_config_file")
         weightPath = rospy.get_param("~darknet_weights_file")
-        metaPath = rospy.get_param("~darknet_meta_file")
+        dataPath = rospy.get_param("~darknet_data_file")
+        
+
+        # Cv bridge
+        self.bridge = CvBridge()
         
         #darknet params; using defaults from darknet.py
         self.darknet_thresh = rospy.get_param("~darknet_thresh", 0.5 )
         self.darknet_hier_thresh = rospy.get_param("~darknet_hier_thresh", 0.5 )
         self.darknet_nms = rospy.get_param("~darknet_nms", 0.45 )
 
-        self.net = darknet.load_net(str(configPath).encode("ascii"), str(weightPath).encode("ascii"), 0)
-        self.meta = darknet.load_meta( str(metaPath).encode("ascii") )
+        #self.net = darknet.load_net(str(configPath).encode("ascii"), str(weightPath).encode("ascii"), 0)
+        #self.meta = darknet.load_meta( str(dataPath).encode("ascii") )
 
+        self.network, self.class_names, self.colors = darknet.load_network(
+            configPath,
+            dataPath,
+            weightPath,
+            0
+        )
+      
         # get network expected image shape params
-        self.net_img_w = darknet.lib.network_width( self.net )
-        self.net_img_h = darknet.lib.network_height( self.net )
+        #self.net_img_w = darknet.lib.network_width( self.net )
+        #self.net_img_h = darknet.lib.network_height( self.net )
 
         # publishers array of classification array
         self.pubs = [ rospy.Publisher( '~%d/output' % i, ClassificationArray, queue_size=1 ) for i in range(self.n_inputs) ]
@@ -80,56 +92,55 @@ class darknet_node(object):
         pub_img = self.pubs_img[idx]
         
         # no subscribers, no work
-        if pub.get_num_connections() < 1 and pub_img.get_num_connections() < 1:
-            return
+        #if pub.get_num_connections() < 1 and pub_img.get_num_connections() < 1:
+        #    rospy.loginfo("No publishers")
+        #    return
 
         rospy.logdebug( 'Processing img with timestamp secs=%d, nsecs=%d', msg.header.stamp.secs, msg.header.stamp.nsecs )
-        rospy.loginfo('here')
+        
         dets, img = self.detect( msg ) # perform detection
         #rospy.loginfo(dets)
         if pub.get_num_connections() > 0:  # publish detections
             pub.publish( dets )
         
         if pub_img.get_num_connections() > 0:  # publish annotated image
-            annotated = self.annotate( img, dets )
-            pub_img.publish( annotated )
+            #annotated = self.annotate( img, dets )
+            #pub_img.publish( annotated )
+            pub_img.publish(self.bridge.cv2_to_imgmsg(img, 'rgb8'))
 
         
     def detect(self, image_msg):
         """ perform object detection in image message, return ClassificationArray, OpenCV Image """
         
         # darknet requires rgb image in proper shape.  we need to resize, and then convert resulting bounding boxes to proper shape
-        img = utils.convert_ros_msg_to_cv2( image_msg, 'rgb8' )
-
-        orig_shape = img.shape
-
         # need distortion-free center crop; detector likely requires square image while input is likely widescreen
-        img, offsets, scale = utils.resize( img, ( self.net_img_h, self.net_img_w ) ) # do crop/resize
-
+        image_cv = self.bridge.imgmsg_to_cv2(image_msg, 'rgb8')
+        image_rgb = cv2.cvtColor(image_cv, cv2.COLOR_BGR2RGB )
+        width = darknet.network_width(self.network)
+        height = darknet.network_height(self.network)
+        orig_shape = image_cv.shape
+        image_resized, offsets, scale = utils.resize( image_rgb, ( width, height ) ) # do crop/resize
         scale_up = 1./ float(scale) #invert scale to convert from resized --> orig
         offsets = np.abs(offsets // 2) # divide offsets by 2 for center crop.  make positive
 
         # convert to darknet img format
-        #  todo:  use darknet/opencv instead?
-        #img_data = darknet_array_to_image( img )  #returns tuple
-
-        # returns [(nameTag, dets[j].prob[i], (b.x, b.y, b.w, b.h))]:
-        dets = []
-        with self.lock:  # darknet apparently not thread-safe, https://github.com/pjreddie/darknet/issues/655
-            #dets = darknet_detect( self.net, self.meta, img_data[0], thresh=self.darknet_thresh, hier_thresh=self.darknet_hier_thresh, nms=self.darknet_nms )
-            dets = darknet_detect( self.net, self.meta, img, thresh=self.darknet_thresh, hier_thresh=self.darknet_hier_thresh, nms=self.darknet_nms )
-            #rospy.loginfo(dets[0][0])
-        # if list of classes is specified, perform filtering on detected classes
+        darknet_image = darknet.make_image(width, height, 3)
+        #image_resized = cv2.resize(image_rgb, (width, height),
+        #                         interpolation=cv2.INTER_LINEAR)
         
-        if dets and self.classes:
-            dets = filter( lambda det : det[0] and str(det[0]).strip().lower() in self.classes, dets )
-       
+        darknet.copy_image_from_bytes(darknet_image, image_resized.tobytes())
+        # returns [(nameTag, dets[j].prob[i], (b.x, b.y, b.w, b.h))]:
+        detections = darknet.detect_image(self.network, self.class_names, darknet_image, thresh=self.darknet_thresh,
+                                          hier_thresh=self.darknet_hier_thresh, nms=self.darknet_nms)
+        darknet.free_image(darknet_image)
+        image = darknet.draw_boxes(detections, image_resized, self.colors)
+               
         msg = ClassificationArray()
         msg.header = image_msg.header #match timestamps
         msg.image_width = orig_shape[1]
         msg.image_height = orig_shape[0]
         
-        for det in dets:
+        for det in detections:
             cls = Classification()
             cls.label = det[0]
             cls.probability = det[1]
@@ -156,7 +167,7 @@ class darknet_node(object):
 
             msg.classifications.append(cls)
         
-        return msg, img
+        return msg, image
 
     def annotate( self, img, clsMsg ):
         """
