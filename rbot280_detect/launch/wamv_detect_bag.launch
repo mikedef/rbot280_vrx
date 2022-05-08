@@ -34,28 +34,32 @@
   </group>
   -->
 
+  <node name='image_throttler' type='throttle' pkg='topic_tools'
+	args='messages /wamv/sensors/cameras/front_center_camera/image_raw 10.0 /wamv/sensors/cameras/front_center_camera/image_raw/throttled' />
   
   <arg name='darknet_py' default='true' />
   <node name="rbot_280_classification" pkg="rbot280_detect" type="darknet_node2.py"                                       
         required="true" output="screen" if="$(arg darknet_py)">                                                                 
     <remap from="~0/input"                                                                                                  
-           to="/wamv/sensors/cameras/front_center_camera/image_raw" />                                                     
+           to="/wamv/sensors/cameras/front_center_camera/image_raw/throttled" />
+
     <!--                                                                                                                   
         <remap from="~1/input" to="$(arg camera1_image_topic)" />                                                              
         <remap from="~2/input" to="$(arg camera2_image_topic)" />                                                             
     -->                                                                                                                             
     <rosparam>                                                                                                                  
       n_inputs: 1                                                                                                       
-                                                                                                                       
-      classes: [boat]                                                                                                                
-      <!--                                                                                                                      
+                                                                            
+      classes: [boat] <!-- Not used -->  
+      
       darknet_config_file: "/home/mikedef/data/yolo/yolov4.cfg"                                                                  
       darknet_weights_file: "/home/mikedef/data/yolo/yolov4.weights"                                                             
-      darknet_data_file: "/home/mikedef/data/yolo/coco_model.data" -->                                                         
+      darknet_data_file: "/home/mikedef/data/yolo/coco_model.data" 
+      <!--                                                                                                                      
       darknet_config_file: "/home/mikedef/data/yolo/darknet/cfg/yolov3.cfg"                                                               
       darknet_weights_file: "/home/mikedef/data/yolo/yolov3.weights"                                                            
-      darknet_data_file: "/home/mikedef/data/yolo/coco_model.data"                                                                   
-      darknet_thresh: 0.4                                                                                                   
+      darknet_data_file: "/home/mikedef/data/yolo/coco_model.data" -->                                                                  
+      darknet_thresh: 0.2  <!-- 0.4 -->                                                                                                   
       darknet_hier_thresh: 0.4                                                                                                
       darknet_nms: 0.35                                                                                                        
       use_sim_time: "true"  <!-- needed for gazebo? -->                                                                    

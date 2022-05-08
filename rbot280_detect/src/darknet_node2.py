@@ -60,20 +60,13 @@ class darknet_node(object):
         self.darknet_hier_thresh = rospy.get_param("~darknet_hier_thresh", 0.5 )
         self.darknet_nms = rospy.get_param("~darknet_nms", 0.45 )
 
-        #self.net = darknet.load_net(str(configPath).encode("ascii"), str(weightPath).encode("ascii"), 0)
-        #self.meta = darknet.load_meta( str(dataPath).encode("ascii") )
-
         self.network, self.class_names, self.colors = darknet.load_network(
             configPath,
             dataPath,
             weightPath,
             0
         )
-      
-        # get network expected image shape params
-        #self.net_img_w = darknet.lib.network_width( self.net )
-        #self.net_img_h = darknet.lib.network_height( self.net )
-
+              
         # publishers array of classification array
         self.pubs = [ rospy.Publisher( '~%d/output' % i, ClassificationArray, queue_size=1 ) for i in range(self.n_inputs) ]
 
@@ -104,9 +97,9 @@ class darknet_node(object):
             pub.publish( dets )
         
         if pub_img.get_num_connections() > 0:  # publish annotated image
-            #annotated = self.annotate( img, dets )
-            #pub_img.publish( annotated )
-            pub_img.publish(self.bridge.cv2_to_imgmsg(img, 'rgb8'))
+            annotated = self.annotate( img, dets )
+            pub_img.publish( annotated )
+            #pub_img.publish(self.bridge.cv2_to_imgmsg(img, 'bgr8'))
 
         
     def detect(self, image_msg):
@@ -125,9 +118,6 @@ class darknet_node(object):
 
         # convert to darknet img format
         darknet_image = darknet.make_image(width, height, 3)
-        #image_resized = cv2.resize(image_rgb, (width, height),
-        #                         interpolation=cv2.INTER_LINEAR)
-        
         darknet.copy_image_from_bytes(darknet_image, image_resized.tobytes())
         # returns [(nameTag, dets[j].prob[i], (b.x, b.y, b.w, b.h))]:
         detections = darknet.detect_image(self.network, self.class_names, darknet_image, thresh=self.darknet_thresh,
@@ -167,7 +157,7 @@ class darknet_node(object):
 
             msg.classifications.append(cls)
         
-        return msg, image
+        return msg, image_cv
 
     def annotate( self, img, clsMsg ):
         """
@@ -188,7 +178,7 @@ class darknet_node(object):
             # draw a bounding box rectangle and label on the image
             color = (255,0,0)
             cv2.rectangle( img, (x, y), (x + w, y + h), color, 2)
-            text = "{}: {:.4f}".format( cls.label, cls.probability )
+            text = "{}: {:.4f}".format( cls.label, float(cls.probability) )
             cv2.putText( img, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.75, color, 2 )
 
         # create ros msg from img
