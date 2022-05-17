@@ -99,7 +99,7 @@ class darknet_node(object):
         if pub_img.get_num_connections() > 0:  # publish annotated image
             annotated = self.annotate( img, dets )
             pub_img.publish( annotated )
-            #pub_img.publish(self.bridge.cv2_to_imgmsg(img, 'bgr8'))
+            #pub_img.publish(self.bridge.cv2_to_imgmsg(img, 'rgb8'))
 
         
     def detect(self, image_msg):
@@ -174,6 +174,7 @@ class darknet_node(object):
         for cls in clsMsg.classifications:
             (w, h) = (cls.roi.width, cls.roi.height)
             (x, y) = ( cls.roi.x_offset, cls.roi.y_offset )
+            
             
             # draw a bounding box rectangle and label on the image
             color = (255,0,0)
