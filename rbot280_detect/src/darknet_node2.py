@@ -92,8 +92,9 @@ class darknet_node(object):
         rospy.logdebug( 'Processing img with timestamp secs=%d, nsecs=%d', msg.header.stamp.secs, msg.header.stamp.nsecs )
         
         dets, img = self.detect( msg ) # perform detection
-        #rospy.loginfo(dets)
-        if pub.get_num_connections() > 0:  # publish detections
+
+        #pub.publish( dets )
+        if pub.get_num_connections() > 0:  # publish detections if something is connected and looking for it?
             pub.publish( dets )
         
         if pub_img.get_num_connections() > 0:  # publish annotated image
@@ -133,15 +134,15 @@ class darknet_node(object):
         for det in detections:
             cls = Classification()
             cls.label = det[0]
-            cls.probability = det[1]
+            cls.probability = float( det[1] )  # Change to float
             roi = det[2]
             #rospy.loginfo("label: %s, prob: %s, roi: %s"%(det[0], det[1], det[2]))
             # darknet roi:  ( x, y, w, h ), where x and y are the centers of the detection
             #  RegionOfInterest x & y are left- and top-most coords
             cls.roi.width = roi[2]
             cls.roi.height = roi[3]
-            cls.roi.x_offset = roi[0] - ( cls.roi.width / 2. )  # convert to left-most x
-            cls.roi.y_offset = roi[1] - ( cls.roi.height / 2. ) # convert to top-most y
+            cls.roi.x_offset = roi[0] - ( cls.roi.width / 2 )   # convert to left-most x
+            cls.roi.y_offset = roi[1] - ( cls.roi.height / 2. )  # convert to top-most y
             
             # scale roi to orig img size
             cls.roi.x_offset *= scale_up
@@ -149,11 +150,15 @@ class darknet_node(object):
             cls.roi.y_offset *= scale_up
             cls.roi.height *= scale_up
             
-            # append crop offset, convert to uint32
-            cls.roi.x_offset = np.uint32( cls.roi.x_offset + offsets[1]  )
-            cls.roi.y_offset = np.uint32( cls.roi.y_offset + offsets[0] )
-            cls.roi.width = np.uint32( cls.roi.width )
-            cls.roi.height = np.uint32( cls.roi.height )
+            # append crop offset, convert to uint32   ***** np does not work here in py3 ***
+            #cls.roi.x_offset = np.uint32( cls.roi.x_offset + offsets[1]  )
+            #cls.roi.y_offset = np.uint32( cls.roi.y_offset + offsets[0] )
+            #cls.roi.width = np.uint32( cls.roi.width )
+            #cls.roi.height = np.uint32( cls.roi.height )
+            cls.roi.x_offset = int( cls.roi.x_offset + offsets[1]  )
+            cls.roi.y_offset = int( cls.roi.y_offset + offsets[0] )
+            cls.roi.width = int( cls.roi.width )
+            cls.roi.height = int( cls.roi.height )
 
             msg.classifications.append(cls)
         

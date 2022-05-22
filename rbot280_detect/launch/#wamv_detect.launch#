@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 
 <launch>
 
@@ -6,7 +7,7 @@
     <include                                                                                                                               
         file="$(find pointcloud_cluster_detect)/launch/pointcloud_cluster_detect.launch">                                                  
       <arg name="pc_topic" value="/wamv/sensors/lidars/lidar_wamv/points"/>                                                                
-      <arg name="filter_camera_view" value="true"/>                                                                                       
+      <arg name="filter_camera_view" value="false  "/>                                                                                       
       <arg name="camera_hfov" value="80" />                                                                                                
       <arg name="camera_theta" value="0.0" />                                                                                              
       <arg name="filter_cloud" value="true"/>                                                                                              
@@ -26,9 +27,9 @@
     <node name='image_throttler' type='throttle' pkg='topic_tools'
 	  args='messages /wamv/sensors/cameras/front_center_camera/image_raw 
 		5.0 
-		/wamv/sensors/cameras/front_center_camera/image_raw/throttled'/>                                                                     
-  <!-- ****** don't forget to turn back to true -->                                            
-  <arg name='darknet_py' default='false' />                                                                                                    
+		/wamv/sensors/cameras/front_center_camera/image_raw/throttled'/>                                                                                                                                           
+                                                                                                                                              
+  <arg name='darknet_py' default='true' />                                                                                                    
   <node name="rbot_280_classification" pkg="rbot280_detect" type="darknet_node2.py"                                                           
         required="true" output="screen" if="$(arg darknet_py)">                                                                               
     <remap from="~0/input"                                                                                                                    

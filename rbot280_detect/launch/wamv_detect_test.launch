@@ -38,15 +38,18 @@
     <rosparam>                                                                                   
       n_inputs: 1                                                                            
       
-      classes: [boat]
+      classes: [object]
       <!--
       darknet_config_file: "/home/mikedef/data/yolo/yolov4.cfg"             
       darknet_weights_file: "/home/mikedef/data/yolo/yolov4.weights"                              
-      darknet_meta_file: "/home/mikedef/data/yolo/coco_model.data" -->
+      darknet_meta_file: "/home/mikedef/data/yolo/coco_model.data" 
       darknet_config_file: "/home/mikedef/data/yolo/darknet/cfg/yolov3.cfg"             
       darknet_weights_file: "/home/mikedef/data/yolo/yolov3.weights"                              
-      darknet_meta_file: "/home/mikedef/data/yolo/coco_model.data"                                         
-      darknet_thresh: 0.4                                                                  
+      darknet_meta_file: "/home/mikedef/data/yolo/coco_model.data" -->
+      darknet_config_file: "/home/mikedef/data/yolo/custom-yolov4-detector.cfg"                                                               
+      darknet_weights_file: "/home/mikedef/data/yolo/object-yolov4-detector_best_1.weights"                                                   
+      darknet_data_file: "/home/mikedef/data/yolo/object-yolov4.data"
+      darknet_thresh: 0.3  <!-- 0.4 -->                                                                
       darknet_hier_thresh: 0.4             
       darknet_nms: 0.35
       use_sim_time: "true"  <!-- needed for gazebo? -->
