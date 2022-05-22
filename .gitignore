@@ -25,3 +25,9 @@ build_*
 *.*~
 vrx_gazebo/models/dock_permutations/*
 *.pyc
+
+# Emacs related                                                                                                                                
+*~                                                                                                                                             
+.\#*                                                                                                                                           
+\#*\#                                                                                                                                          
+*.bag
