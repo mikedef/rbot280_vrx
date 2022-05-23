@@ -1,0 +1,16 @@
+<launch>
+
+  <arg name="pc_topic" default="/wamv/sensors/lidars/lidar_wamv/points" />
+  <arg name="camera_hfov" default="0" />
+  <arg name="camera_theta" default="0.0" />
+  <arg name="leaf_size" default="0.0" />
+
+  <node pkg="rbot280_detect" type="pointcloud_camera_filter" name="pointcloud_camera_filter"
+	output="screen" >
+    <param name="pc_topic" value="$(arg pc_topic)" />
+    <param name="camera_hfov" value="$(arg camera_hfov)" />
+    <param name="camera_theta" value="$(arg camera_theta)" />
+    <param name="leaf_size" value="$(arg leaf_size)" />
+  </node>
+  
+</launch>

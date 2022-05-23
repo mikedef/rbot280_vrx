@@ -1,0 +1,13 @@
+<launch>
+  <!-- launch camera filter for pc -->
+  <group ns="/wamv/sensors/lidars" >
+    <include
+	file="$(find rbot280_detect)/launch/pointcloud_camera_filter.launch" >
+      <arg name="pc_topic" value="/wamv/sensors/lidars/lidar_wamv/points" />
+      <arg name="camera_hfov" value="80" />
+      <arg name="camera_theta" value="0.0" />
+      <arg name="leaf_size" value="0.0" />
+    </include>
+  </group>
+
+</launch>
