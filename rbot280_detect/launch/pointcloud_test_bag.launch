@@ -20,7 +20,16 @@
       <arg name="camera_theta" value="0.0" />
       <arg name="leaf_size" value="0.1" />
     </include>                                                                                                                     
-  </group> 
+  </group>
+
+  <!-- Launch pointcloud image overlay  -->
+  <node pkg="rbot280_detect" name="pointcloud_image_overlay"
+	type="pointcloud_image_overlay"
+	output="screen" >
+    <param name="img_src" value="/wamv/sensors/cameras/front_center_camera/image_raw" />
+    <param name="img_info_src" value="/wamv/sensors/cameras/front_center_camera/camera_info" />
+    <param name="cloud_src" value="/wamv/sensors/lidars/lidar_wamv/points/camera_FOV_cloud" />
+  </node>
   
   <!-- launch rviz, static joint transforms, revolute joint static transforms 
   <include file="$(find wamv_gazebo)/launch/rviz_vrx.launch" />  -->                                                          
