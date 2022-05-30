@@ -53,7 +53,7 @@ void PclImageOverlay::PcImageFusionCb(const sensor_msgs::ImageConstPtr& in_img_m
 	  && (xy_point.y >=0) && (xy_point.y < image_size_.height))
 	{
 	  cv::circle(cv_ptr->image, cv::Point(xy_point.x, xy_point.y),
-		     3, cv::Scalar(0,255,0), 5);
+		     2, cv::Scalar(0,255,0), 5);
 	}
     }
   

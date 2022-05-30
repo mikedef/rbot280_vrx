@@ -22,14 +22,40 @@
     </include>                                                                                                                     
   </group>
 
+  
+  <node name='image_throttler' type='throttle' pkg='topic_tools'                                                                           
+        args='messages /wamv/sensors/cameras/front_center_camera/image_raw 10.0 /wamv/sensors/cameras/front_center_camera/image_raw/throttled' /> 
+  
+  <arg name='darknet_py' default='true' />                                                                                                 
+  <node name="rbot_280_classification" pkg="rbot280_detect" type="darknet_node2.py"                                                        
+        required="true" output="screen" if="$(arg darknet_py)">                                                                            
+    <remap from="~0/input"                                                                                                                 
+           to="/wamv/sensors/cameras/front_center_camera/image_raw/throttled" />
+     <rosparam>                                                                                                                           
+      n_inputs: 1                                                                                                                          
+      classes: [object] 
+      darknet_config_file: "/home/mikedef/data/yolo/custom-yolov4-detector.cfg"                                                            
+      darknet_weights_file: "/home/mikedef/data/yolo/object-yolov4-detector_best_1.weights"                                                
+      darknet_data_file: "/home/mikedef/data/yolo/object-yolov4.data"                                                           
+      darknet_thresh: 0.2  
+      darknet_hier_thresh: 0.4                                                                                                             
+      darknet_nms: 0.35                                                                                                                    
+      use_sim_time: "true" 
+    </rosparam>                                                                                                                            
+  </node> 
+
   <!-- Launch pointcloud image overlay  -->
   <node pkg="rbot280_detect" name="pointcloud_image_overlay"
 	type="pointcloud_image_overlay"
 	output="screen" >
-    <param name="img_src" value="/wamv/sensors/cameras/front_center_camera/image_raw" />
+    <!-- <param name="img_src" value="/wamv/sensors/cameras/front_center_camera/image_raw" /> -->
+    <!-- <param name="img_src" value="/wamv/sensors/cameras/front_center_camera/image_raw/throttled" /> -->
+    <param name="img_src" value="rbot_280_classification/0/image" /> 
     <param name="img_info_src" value="/wamv/sensors/cameras/front_center_camera/camera_info" />
-    <param name="cloud_src" value="/wamv/sensors/lidars/lidar_wamv/points/camera_FOV_cloud" />
+    <param name="cloud_src" value="/wamv/sensors/lidars/lidar_wamv/points/camera_FOV_cloud" /> 
   </node>
+
+
   
   <!-- launch rviz, static joint transforms, revolute joint static transforms 
   <include file="$(find wamv_gazebo)/launch/rviz_vrx.launch" />  -->                                                          
