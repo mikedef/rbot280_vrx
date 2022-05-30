@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(rbot280_detect)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++14)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -57,11 +57,14 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
+add_message_files(
+  DIRECTORY ../rbot_msgs/msg
+  FILES
+  ClassificationArray.msg
+  Classification.msg
 #   Message1.msg
 #   Message2.msg
-# )
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -78,10 +81,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
+generate_messages(
+  DEPENDENCIES
+  rbot_msgs
 #   geometry_msgs#   rbot_msgs#   sensor_msgs#   std_msgs
-# )
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -129,13 +133,24 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
   )
 
 add_executable(pointcloud_camera_filter
   src/pointcloud_camera_filter.cpp
   )
+add_executable(pointcloud_image_overlay
+  nodes/pointcloud_image_overlay.cpp
+  nodes/pointcloud_image_overlay_node.cpp
+  )
 
 target_link_libraries(pointcloud_camera_filter ${catkin_LIBRARIES})
+target_link_libraries(pointcloud_image_overlay
+  ${catkin_LIBRARIES}
+  ${OpenCV_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
+  )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
