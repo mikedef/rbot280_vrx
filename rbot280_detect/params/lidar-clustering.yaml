@@ -1,8 +1,8 @@
 
 filter_cloud: true
-remove_points: 3.0
+remove_points: 2.0
 downsampled_cloud: true
-leaf_size: 0.05
+leaf_size: 0.1
 clustering_distance: 2.0
 cluster_size_min: '10'
 cluster_size_max: '100'

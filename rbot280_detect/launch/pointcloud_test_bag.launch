@@ -1,25 +1,23 @@
 <?xml version="1.0"?>
 
-<launch>                                                                                                                        
-                                                                                                                                
+<launch>                        
   <arg name="bag_file" default="/home/mikedef/data/driving-to-dock.bag" />                
   <arg name="start" default="0" />                       
   <node pkg="rosbag" name="play" type="play"
 	args="--clock -l -s $(arg start) $(arg bag_file)" />                   
-
   <arg name="rviz_config" default="$(find rbot280)/rviz/wamv_.rviz" />                                 
-  <node pkg="rviz" type="rviz"                                                                           
+  <node pkg="rviz" type="rviz"                                                              
         name="wamv_visualization" args="-d $(arg rviz_config)" />
 
-    <!-- launch camera filter for pc -->                                                                                           
-  <group ns="/wamv/sensors/lidars" >                                                                                               
-    <include                                                                                                                       
-        file="$(find rbot280_detect)/launch/pointcloud_camera_filter.launch" >                                                     
-      <arg name="pc_topic" value="/wamv/sensors/lidars/lidar_wamv/points" />                                                       
-      <arg name="camera_hfov" value="80" />                                                                                       
+  <!-- launch camera filter for pc -->                                       
+  <group ns="/wamv/sensors/lidars" >                                                            
+    <include                                                                                          
+        file="$(find rbot280_detect)/launch/pointcloud_camera_filter.launch" >                        
+      <arg name="pc_topic" value="/wamv/sensors/lidars/lidar_wamv/points" />                          
+      <arg name="camera_hfov" value="80" />                                                         
       <arg name="camera_theta" value="0.0" />
       <arg name="leaf_size" value="0.1" />
-    </include>                                                                                                                     
+    </include>                                                                                          
   </group>
 
   
@@ -47,11 +45,16 @@
   <node pkg="rbot280_detect" name="pointcloud_image_overlay"
 	type="pointcloud_image_overlay"
 	output="screen" >
-    <!-- <param name="img_src" value="/wamv/sensors/cameras/front_center_camera/image_raw" /> -->
-    <!-- <param name="img_src" value="/wamv/sensors/cameras/front_center_camera/image_raw/throttled" /> -->
-    <param name="img_src" value="rbot_280_classification/0/image" /> 
-    <param name="img_info_src" value="/wamv/sensors/cameras/front_center_camera/camera_info" />
-    <param name="cloud_src" value="/wamv/sensors/lidars/lidar_wamv/points/camera_FOV_cloud" /> 
+    <!-- For output from classification
+    <param name="img_src"
+	   value="rbot_280_classification/0/image" /> 
+    -->
+    <param name="img_src"
+	   value="/wamv/sensors/cameras/front_center_camera/image_raw" /> 
+    <param name="img_info_src"
+	   value="/wamv/sensors/cameras/front_center_camera/camera_info" />
+    <param name="cloud_src"
+	   value="/wamv/sensors/lidars/lidar_wamv/points/camera_FOV_cloud" /> 
   </node>
 
     <!-- Lidar clustering -->                
@@ -60,7 +63,8 @@
           type="pointcloud_euclidean_cluster_detect"                                                    
           name="pointcloud_euclidean_cluster_detect"                                                    
           output="screen" >                                                                             
-      <param name="pc_topic" value="/velodyne_points"/>                                                 
+      <param name="pc_topic"
+	     value="/wamv/sensors/lidars/lidar_wamv/points/camera_FOV_cloud" /> 
       <rosparam                                                                                         
         file="$(find rbot280_detect)/params/lidar-clustering.yaml" />                                   
     </node>                                                                                             
