@@ -296,7 +296,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /rbot_280_classification/0/image
+      Image Topic: /wamv/sensors/cameras/front_center_camera/image_raw/pc_image_fusion
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -334,7 +334,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 30.657608032226562
+      Distance: 27.2249755859375
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -350,9 +350,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.46479669213294983
+      Pitch: 0.4847966730594635
       Target Frame: wamv/base_link
-      Yaw: 3.5172784328460693
+      Yaw: 3.2672743797302246
     Saved: ~
 Window Geometry:
   Displays:
