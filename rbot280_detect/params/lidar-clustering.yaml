@@ -1,0 +1,12 @@
+
+filter_cloud: true
+remove_points: 3.0
+downsampled_cloud: true
+leaf_size: 0.05
+clustering_distance: 2.0
+cluster_size_min: '10'
+cluster_size_max: '100'
+cluster_seg_thresh: '10.0'
+drop_cluster_count: '10'
+nmea_msg_header: 'PYLOB'
+viz: true

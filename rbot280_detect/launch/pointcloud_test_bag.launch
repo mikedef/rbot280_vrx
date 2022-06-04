@@ -30,6 +30,19 @@
     <param name="img_info_src" value="/wamv/sensors/cameras/front_center_camera/camera_info" />
     <param name="cloud_src" value="/wamv/sensors/lidars/lidar_wamv/points/camera_FOV_cloud" />
   </node>
+
+    <!-- launch lidar clustering -->                                                                    
+  <!-- -->                                                                                              
+  <group ns="lidar_clustering">                                                                         
+    <node pkg="pointcloud_cluster_detect"                                                               
+          type="pointcloud_euclidean_cluster_detect"                                                    
+          name="pointcloud_euclidean_cluster_detect"                                                    
+          output="screen" >                                                                             
+      <param name="pc_topic" value="/velodyne_points"/>                                                 
+      <rosparam                                                                                         
+        file="$(find rbot280_detect)/params/lidar-clustering.yaml" />                                  
+    </node>                                                                                             
+  </group> 
   
   <!-- launch rviz, static joint transforms, revolute joint static transforms 
   <include file="$(find wamv_gazebo)/launch/rviz_vrx.launch" />  -->                                                          
