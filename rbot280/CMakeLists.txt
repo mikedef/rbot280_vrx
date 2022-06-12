@@ -20,6 +20,9 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   tf
   geometry_msgs
+  move_base
+  move_base_msgs
+  actionlib
 )
 
 ## System dependencies are found with CMake's conventions
@@ -128,7 +131,12 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
-)
+  )
+
+add_executable(navigation_goals src/navigation_goals.cpp)
+target_link_libraries(navigation_goals
+  ${catkin_LIBRARIES}
+  )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}

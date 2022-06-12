@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /TF1/Frames1
+        - /PC-IMG_Fused1
       Splitter Ratio: 0.7235022783279419
     Tree Height: 281
   - Class: rviz/Selection
@@ -77,8 +78,6 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        utm:
-          Value: true
         wamv/base_link:
           Value: true
         wamv/cpu_cases_link:
@@ -125,8 +124,6 @@ Visualization Manager:
           Value: false
         wamv/lidar_wamv_post_link:
           Value: false
-        wamv/odom:
-          Value: true
         wamv/right_battery_link:
           Value: false
         wamv/right_engine_link:
@@ -140,47 +137,44 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        wamv/odom:
-          utm:
+        wamv/base_link:
+          wamv/cpu_cases_link:
             {}
-          wamv/base_link:
-            wamv/cpu_cases_link:
-              {}
-            wamv/dummy_link:
-              {}
-            wamv/front_center_camera_post_link:
-              wamv/front_center_camera_post_arm_link:
-                wamv/front_center_camera_link:
-                  wamv/front_center_camera_link_optical:
-                    {}
-            wamv/front_left_camera_post_link:
-              wamv/front_left_camera_post_arm_link:
-                wamv/front_left_camera_link:
-                  wamv/front_left_camera_link_optical:
-                    {}
-            wamv/front_right_camera_post_link:
-              wamv/front_right_camera_post_arm_link:
-                wamv/front_right_camera_link:
-                  wamv/front_right_camera_link_optical:
-                    {}
-            wamv/gps_wamv_link:
-              {}
-            wamv/imu_wamv_link:
-              {}
-            wamv/left_battery_link:
-              {}
-            wamv/left_engine_link:
-              wamv/left_propeller_link:
-                {}
-            wamv/lidar_wamv_post_link:
-              wamv/lidar_wamv_post_arm_link:
-                wamv/lidar_wamv_link:
+          wamv/dummy_link:
+            {}
+          wamv/front_center_camera_post_link:
+            wamv/front_center_camera_post_arm_link:
+              wamv/front_center_camera_link:
+                wamv/front_center_camera_link_optical:
                   {}
-            wamv/right_battery_link:
+          wamv/front_left_camera_post_link:
+            wamv/front_left_camera_post_arm_link:
+              wamv/front_left_camera_link:
+                wamv/front_left_camera_link_optical:
+                  {}
+          wamv/front_right_camera_post_link:
+            wamv/front_right_camera_post_arm_link:
+              wamv/front_right_camera_link:
+                wamv/front_right_camera_link_optical:
+                  {}
+          wamv/gps_wamv_link:
+            {}
+          wamv/imu_wamv_link:
+            {}
+          wamv/left_battery_link:
+            {}
+          wamv/left_engine_link:
+            wamv/left_propeller_link:
               {}
-            wamv/right_engine_link:
-              wamv/right_propeller_link:
+          wamv/lidar_wamv_post_link:
+            wamv/lidar_wamv_post_arm_link:
+              wamv/lidar_wamv_link:
                 {}
+          wamv/right_battery_link:
+            {}
+          wamv/right_engine_link:
+            wamv/right_propeller_link:
+              {}
       Update Interval: 0
       Value: true
     - Class: rviz/Image
@@ -293,7 +287,7 @@ Visualization Manager:
       Value: false
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /wamv/sensors/cameras/front_center_camera/image_raw/pc_image_fusion
+      Image Topic: /rbot_280_classification/0/image/pc_image_fusion
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -359,7 +353,7 @@ Visualization Manager:
       Near Clip Distance: 0.009999999776482582
       Pitch: 0.33979666233062744
       Target Frame: wamv/base_link
-      Yaw: 3.1422760486602783
+      Yaw: 3.1472761631011963
     Saved: ~
 Window Geometry:
   Displays:

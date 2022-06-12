@@ -144,9 +144,18 @@ add_executable(pointcloud_image_overlay
   nodes/pointcloud_image_overlay.cpp
   nodes/pointcloud_image_overlay_node.cpp
   )
+add_executable(object_tracking
+  nodes/object_tracking.cpp
+  nodes/object_tracking_node.cpp
+  )
 
 target_link_libraries(pointcloud_camera_filter ${catkin_LIBRARIES})
 target_link_libraries(pointcloud_image_overlay
+  ${catkin_LIBRARIES}
+  ${OpenCV_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
+  )
+target_link_libraries(object_tracking
   ${catkin_LIBRARIES}
   ${OpenCV_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}

@@ -40,21 +40,41 @@
       use_sim_time: "true" 
     </rosparam>                                                                                  
   </node> 
-
+  
   <!-- Launch pointcloud image overlay  -->
+  <arg name='pc_image_overlay' default='true' />
   <node pkg="rbot280_detect" name="pointcloud_image_overlay"
 	type="pointcloud_image_overlay"
-	output="screen" >
-    <!-- For output from classification
+	output="screen"
+	if="$(arg pc_image_overlay)" > 
+    <!-- For output from classification     -->
     <param name="img_src"
 	   value="rbot_280_classification/0/image" /> 
+    <!-- for output from raw image file
+    <param name="img_src"
+	   value="/wamv/sensors/cameras/front_center_camera/image_raw" /> 
     -->
+    <param name="img_info_src"
+	   value="/wamv/sensors/cameras/front_center_camera/camera_info" />
+    <param name="cloud_src"
+	   value="/wamv/sensors/lidars/lidar_wamv/points/camera_FOV_cloud" /> 
+  </node>
+
+  <!-- Launch pointcloud image overlay  -->
+  <arg name='object_tracking' default='true' />
+  <node pkg="rbot280_detect" name="object_tracking"
+	type="object_tracking"
+	output="screen"
+	if="$(arg object_tracking)" > 
+    <!-- for output from raw image file -->
     <param name="img_src"
 	   value="/wamv/sensors/cameras/front_center_camera/image_raw" /> 
     <param name="img_info_src"
 	   value="/wamv/sensors/cameras/front_center_camera/camera_info" />
     <param name="cloud_src"
-	   value="/wamv/sensors/lidars/lidar_wamv/points/camera_FOV_cloud" /> 
+	   value="/wamv/sensors/lidars/lidar_wamv/points/camera_FOV_cloud" />
+    <param name="classification_src"
+	   value="/rbot_280_classification/0/output" />
   </node>
 
     <!-- Lidar clustering -->                

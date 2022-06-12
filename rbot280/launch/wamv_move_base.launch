@@ -23,6 +23,10 @@
     <remap from="cmd_vel" to="$(arg cmd_vel_topic)" />    
   </node>
 
+  <node name="navigation_goals_node" pkg="rbot280" type="navigation_goals"
+	output="screen">
+  </node>
+  
   <!-- launch wamv control 
        <include file="$(find rbot280)/launch/wamv_control.launch" /> -->
   
